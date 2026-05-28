@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CastCheck — Recovery Intelligence</title>
+  <meta name="description" content="An immersive cast recovery checker that helps you track symptoms, monitor progress, and know when to seek medical advice." />
+  <style>
+    :root{
+      --bg:#07080c;
+      --bg2:#0d1018;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.09);
+      --line:rgba(255,255,255,.12);
+      --text:#f4f6fb;
+      --muted:rgba(244,246,251,.72);
+      --soft:rgba(244,246,251,.48);
+      --accent:#7dd3fc;
+      --accent2:#b7a7ff;
+      --warn:#ff8f6b;
+      --good:#6ee7b7;
+      --shadow:0 30px 80px rgba(0,0,0,.45);
+      --radius:28px;
+      --radius2:18px;
+      --max:1260px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(125,211,252,.18), transparent 50%),
+        radial-gradient(900px 500px at 80% 15%, rgba(183,167,255,.14), transparent 45%),
+        radial-gradient(900px 700px at 50% 80%, rgba(110,231,183,.09), transparent 50%),
+        linear-gradient(180deg, #05060a 0%, #0a0d14 55%, #05060a 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background-image:linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size:64px 64px;
+      mask-image:radial-gradient(circle at center, black 35%, transparent 100%);
+      opacity:.25;
+    }
+    .wrap{width:min(var(--max), calc(100% - 40px)); margin:0 auto}
+    .topbar{
+      position:fixed; top:18px; left:0; right:0; z-index:50;
+      pointer-events:none;
+    }
+    .topbar .inner{
+      width:min(var(--max), calc(100% - 40px));
+      margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px;
+      background:rgba(8,10,16,.5);
+      backdrop-filter: blur(20px);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:12px 16px;
+      box-shadow:var(--shadow);
+      pointer-events:auto;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:0}
+    .logo{
+      width:38px; height:38px; border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.15) 18%, transparent 19%),
+        linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 30px rgba(125,211,252,.35);
+      flex:0 0 auto;
+    }
+    .brand strong{font-size:14px; letter-spacing:.18em; text-transform:uppercase}
+    .brand span{display:block; font-size:12px; color:var(--muted); margin-top:1px}
+    .nav{display:flex; gap:16px; flex-wrap:wrap; justify-content:flex-end}
+    .nav a{
+      color:var(--muted); text-decoration:none; font-size:13px;
+      padding:8px 10px; border-radius:999px; transition:.25s ease;
+    }
+    .nav a:hover{color:var(--text); background:rgba(255,255,255,.06)}
+    .hero{
+      min-height:100vh;
+      display:grid;
+      align-items:center;
+      padding:120px 0 54px;
+      position:relative;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:28px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex; align-items:center; gap:10px;
+      font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+      color:var(--soft);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 14px;
+      background:rgba(255,255,255,.03);
+    }
+    .eyebrow i{
+      width:8px; height:8px; border-radius:50%;
+      background:var(--good); box-shadow:0 0 18px rgba(110,231,183,.7);
+      display:inline-block;
+    }
+    h1{
+      font-size:clamp(3rem, 8vw, 6.8rem);
+      line-height:.92;
+      margin:18px 0 16px;
+      letter-spacing:-.05em;
+    }
+    .lead{
+      max-width:62ch;
+      font-size:clamp(1.02rem, 1.8vw, 1.2rem);
+      color:var(--muted);
+      line-height:1.75;
+    }
+    .hero-actions{display:flex; gap:14px; flex-wrap:wrap; margin-top:28px}
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      border-radius:999px;
+      padding:15px 22px;
+      font-weight:650;
+      letter-spacing:.01em;
+      transition:.25s ease;
+      text-decoration:none;
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+    .btn.primary{
+      color:#07111c;
+      background:linear-gradient(135deg, #9be7ff, #d6c7ff);
+      box-shadow:0 18px 40px rgba(125,211,252,.18);
+    }
+    .btn.secondary{
+      color:var(--text);
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .stat-row{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:30px;
+    }
+    .stat{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      min-height:108px;
+    }
+    .stat strong{display:block; font-size:1.6rem; margin-bottom:8px}
+    .stat span{color:var(--muted); font-size:13px; line-height:1.5}
+    .scene{
+      position:relative;
+      min-height:640px;
+      border-radius:34px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(125,211,252,.18), transparent 30%),
+        radial-gradient(circle at 75% 18%, rgba(183,167,255,.18), transparent 35%),
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+    }
+    .orb{
+      position:absolute; inset:auto;
+      border-radius:50%;
+      filter:blur(2px);
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb.one{width:220px; height:220px; left:-40px; top:45px; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(125,211,252,.6) 20%, rgba(125,211,252,.08) 58%, transparent 70%)}
+    .orb.two{width:280px; height:280px; right:-70px; top:120px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(183,167,255,.55) 20%, rgba(183,167,255,.08) 58%, transparent 70%); animation-delay:1.2s}
+    .orb.three{width:170px; height:170px; left:22%; bottom:70px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(110,231,183,.45) 18%, rgba(110,231,183,.06) 62%, transparent 72%); animation-delay:2.4s}
+    .cast{
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      width:min(420px, 80%);
+      aspect-ratio:1/1;
+      display:grid; place-items:center;
+    }
+    .cast .ring{
+      position:absolute; inset:0;
+      border-radius:50%;
+      background:conic-gradient(from 0deg, rgba(125,211,252,.9), rgba(183,167,255,.9), rgba(110,231,183,.9), rgba(125,211,252,.9));
+      mask:radial-gradient(circle, transparent 52%, black 54%);
+      opacity:.75;
+      animation: spin 18s linear infinite;
+    }
+    .cast .core{
+      width:64%;
+      aspect-ratio:1;
+      border-radius:32%;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.38), rgba(255,255,255,.12)),
+        linear-gradient(180deg, rgba(15,18,28,.85), rgba(9,12,18,.95));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.24), 0 30px 80px rgba(0,0,0,.36);
+      position:relative;
+      overflow:hidden;
+    }
+    .cast .core::before, .cast .core::after{
+      content:""; position:absolute; left:50%; transform:translateX(-50%);
+      width:72%; border-radius:999px;
+      background:rgba(255,255,255,.08);
+    }
+    .cast .core::before{height:16px; top:18%}
+    .cast .core::after{height:16px; bottom:18%}
+    .cast .strap{
+      position:absolute; width:22%; height:82%;
+      border-radius:40px;
+      background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05));
+      filter:blur(.2px);
+      top:9%;
+    }
+    .cast .strap.left{left:10%; transform:rotate(-10deg)}
+    .cast .strap.right{right:10%; transform:rotate(10deg)}
+    .float-card{
+      position:absolute;
+      background:rgba(8,10,16,.44);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:0 16px 30px rgba(0,0,0,.22);
+      animation: drift 7s ease-in-out infinite;
+    }
+    .float-card b{display:block; font-size:13px; margin-bottom:4px}
+    .float-card small{color:var(--muted)}
+    .card-a{left:18px; top:18px}
+    .card-b{right:18px; top:26px; animation-delay:1.5s}
+    .card-c{right:36px; bottom:26px; animation-delay:3s}
+    .card-d{left:30px; bottom:40px; animation-delay:4.2s}
+    section{padding:90px 0}
+    .section-head{
+      display:flex; justify-content:space-between; align-items:flex-end; gap:18px;
+      margin-bottom:24px;
+    }
+    .section-head h2{
+      margin:0; font-size:clamp(2rem, 4vw, 3.2rem); letter-spacing:-.04em;
+    }
+    .section-head p{margin:0; max-width:60ch; color:var(--muted); line-height:1.7}
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+    .field{
+      display:grid; gap:8px; margin-bottom:14px;
+    }
+    label{font-size:13px; color:var(--muted)}
+    input[type="range"], input[type="number"], select{
+      width:100%;
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:14px 14px;
+      outline:none;
+    }
+    input[type="range"]{padding:12px 0}
+    .checks{
+      display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+    }
+    .check{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      min-height:72px;
+    }
+    .check input{margin-top:4px; transform:scale(1.15)}
+    .check span{color:var(--muted); font-size:13px; line-height:1.45}
+    .recovery{
+      display:grid; gap:16px;
+    }
+    .meter{
+      height:16px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden; border:1px solid rgba(255,255,255,.08)
+    }
+    .meter > div{
+      height:100%; width:62%;
+      background:linear-gradient(90deg, var(--warn), #ffd56b, var(--good));
+      border-radius:inherit;
+      box-shadow:0 0 22px rgba(110,231,183,.22);
+    }
+    .result{
+      font-size:1.4rem; font-weight:750;
+      margin:0;
+      letter-spacing:-.03em;
+    }
+    .result.good{color:var(--good)}
+    .result.warn{color:#ffd56b}
+    .result.bad{color:var(--warn)}
+    .muted{color:var(--muted); line-height:1.7}
+    .tips{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+      margin-top:16px;
+    }
+    .tip{
+      padding:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+    }
+    .tip strong{display:block; margin-bottom:6px}
+    .timeline{
+      display:grid; gap:12px;
+    }
+    .step{
+      display:flex; gap:14px; align-items:flex-start;
+      padding:16px 18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+    }
+    .dot{
+      width:12px; height:12px; border-radius:50%;
+      margin-top:6px; background:linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 18px rgba(125,211,252,.4);
+      flex:0 0 auto;
+    }
+    footer{
+      padding:44px 0 60px;
+      color:var(--soft);
+      font-size:13px;
+    }
+    .footer-box{
+      display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap;
+      border-top:1px solid rgba(255,255,255,.1);
+      padding-top:22px;
+    }
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+    @media (max-width: 980px){
+      .hero-grid,.grid-2,.tips,.stat-row{grid-template-columns:1fr}
+      .scene{min-height:520px}
+      .nav{display:none}
+      h1{font-size:clamp(2.8rem, 13vw, 5rem)}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(var(--max), calc(100% - 24px))}
+      .topbar{top:12px}
+      .topbar .inner{padding:10px 12px}
+      .hero{padding-top:110px}
+      .checks{grid-template-columns:1fr}
+      .section-head{flex-direction:column; align-items:flex-start}
+      .btn{width:100%}
+      .hero-actions{display:grid; width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <strong>CastCheck</strong>
+          <span>Recovery intelligence for injuries</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#checker">Checker</a>
+        <a href="#care">Care guide</a>
+        <a href="#timeline">Timeline</a>
+      </nav>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><i></i> Recovery, reimagined</div>
+          <h1>Know whether your cast recovery is on track.</h1>
+          <p class="lead">
+            An immersive cast-check experience that helps you track pain, swelling, numbness, movement, and cast condition — then suggests whether you should monitor at home or seek medical advice.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#checker">Start recovery check</a>
+            <a class="btn secondary" href="#care">See cast care tips</a>
+          </div>
+          <div class="stat-row">
+            <div class="stat">
+              <strong>60 sec</strong>
+              <span>Fast symptom check with a luxury-style guided flow.</span>
+            </div>
+            <div class="stat">
+              <strong>Daily</strong>
+              <span>Track your healing with check-ins and a recovery timeline.</span>
+            </div>
+            <div class="stat">
+              <strong>Clear</strong>
+              <span>Simple next-step guidance when warning signs appear.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scene" aria-hidden="true">
+          <div class="orb one"></div>
+          <div class="orb two"></div>
+          <div class="orb three"></div>
+          <div class="cast">
+            <div class="ring"></div>
+            <div class="strap left"></div>
+            <div class="strap right"></div>
+            <div class="core"></div>
+          </div>
+          <div class="float-card card-a"><b>Pain trend</b><small>down 18% this week</small></div>
+          <div class="float-card card-b"><b>Swelling</b><small>improving after elevation</small></div>
+          <div class="float-card card-c"><b>Cast status</b><small>dry, intact, secure</small></div>
+          <div class="float-card card-d"><b>Confidence</b><small>based on today’s answers</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="checker">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Recovery checker</h2>
+            <p>Answer a few quick questions. The result is a screening recommendation, not a diagnosis, so you always get a safer next step.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="field">
+              <label for="pain">Pain level today: <span id="painVal">3</span>/10</label>
+              <input id="pain" type="range" min="0" max="10" value="3" />
+            </div>
+            <div class="field">
+              <label for="swelling">Swelling</label>
+              <select id="swelling">
+                <option value="none">None</option>
+                <option value="mild" selected>Mild and improving</option>
+                <option value="moderate">Moderate</option>
+                <option value="severe">Severe or worsening</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="color">Fingers / toes colour</label>
+              <select id="color">
+                <option value="normal" selected>Normal / warm</option>
+                <option value="pale">Pale / cold</option>
+                <option value="blue">Blue / purple</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="movement">Can you wiggle fingers / toes?</label>
+              <select id="movement">
+                <option value="yes" selected>Yes</option>
+                <option value="limited">Somewhat limited</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wet">Cast condition</label>
+              <select id="wet">
+                <option value="dry" selected>Dry and intact</option>
+                <option value="damp">Damp</option>
+                <option value="wet">Wet / soft / cracked</option>
+                <option value="loose">Loose or slipping</option>
+              </select>
+            </div>
+
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="numbness"><span>Numbness or tingling in fingers / toes</span></label>
+              <label class="check"><input type="checkbox" id="odor"><span>Bad smell, drainage, or fever</span></label>
+              <label class="check"><input type="checkbox" id="tight"><span>Cast feels too tight or pressure is rising</span></label>
+              <label class="check"><input type="checkbox" id="lifthelps"><span>Elevation helps symptoms improve</span></label>
+            </div>
+          </div>
+
+          <div class="panel recovery">
+            <p class="result good" id="status">On track — keep monitoring.</p>
+            <div class="meter"><div id="meterFill"></div></div>
+            <p class="muted" id="summary">
+              Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.
+            </p>
+            <div class="tips">
+              <div class="tip">
+                <strong>Do this now</strong>
+                <span>Keep the cast dry, rest the limb, and elevate it above heart level when possible.</span>
+              </div>
+              <div class="tip">
+                <strong>Watch for</strong>
+                <span>Worsening pain, numbness, cold or blue digits, swelling, or trouble moving fingers / toes.</span>
+              </div>
+              <div class="tip">
+                <strong>Next step</strong>
+                <span>If symptoms worsen or do not improve after elevation, contact a medical professional.</span>
+              </div>
+            </div>
+            <div class="panel" style="padding:18px; background:rgba(255,255,255,.03); border-radius:22px;">
+              <strong style="display:block; margin-bottom:10px;">What the score means</strong>
+              <div class="timeline" id="meaning">
+                <div class="step"><div class="dot"></div><div><strong style="display:block;">0–24</strong><span class="muted">Likely on track. Keep following cast care instructions.</span></div></div>
+                <div class="step"><div class="dot"></div><div><strong style="display:block;">25–59</strong><span class="muted">Monitor closely. Recheck symptoms and elevate the limb.</span></div></div>
+                <div class="step"><div class="dot"></div><div><strong style="display:block;">60+</strong><span class="muted">Seek medical advice promptly, especially for tightness, numbness, or color change.</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="care">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Cast care guide</h2>
+            <p>The experience should educate as it reassures. These are the practical reminders most users need every day.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3 style="margin-top:0;">Daily habits</h3>
+            <p class="muted">Keep the cast dry, avoid putting objects inside it, and raise the injured limb to reduce swelling. Moving fingers or toes gently can also help circulation when it’s safe to do so.</p>
+            <div class="timeline">
+              <div class="step"><div class="dot"></div><div><strong>Keep it dry</strong><span class="muted">Use protection in the shower and avoid soaking the cast.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Elevate often</strong><span class="muted">Swelling usually feels better when the limb is raised above the heart.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Don’t insert objects</strong><span class="muted">Scratchers, pencils, and powders can irritate skin and damage the cast.</span></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3 style="margin-top:0;">Get help sooner if</h3>
+            <p class="muted">A cast should not cause escalating pain, numbness, blue or pale digits, or reduced movement. Wet, cracked, loose, or foul-smelling casts also need attention.</p>
+            <div class="timeline">
+              <div class="step"><div class="dot"></div><div><strong>Severe pain or tightness</strong><span class="muted">Especially if elevation doesn’t help.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Numbness or tingling</strong><span class="muted">This can signal too much pressure or circulation issues.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Color change</strong><span class="muted">Cold, pale, blue, or purple fingers and toes are not normal.</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="timeline">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Recovery timeline</h2>
+            <p>Make the site feel premium by showing progress over time, not just a static answer.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3 style="margin-top:0;">Suggested journey</h3>
+            <div class="timeline">
+              <div class="step"><div class="dot"></div><div><strong>Day 1–3</strong><span class="muted">Expect swelling, use elevation, and track pain every few hours.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Day 4–10</strong><span class="muted">Symptoms should begin settling. Tightness or worsening discomfort deserves attention.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Week 2+</strong><span class="muted">Track function, comfort, and whether the cast still feels secure and dry.</span></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3 style="margin-top:0;">Product notes</h3>
+            <p class="muted">
+              This layout is designed to feel like a luxury digital launch: strong typography, cinematic depth, smooth motion, and a guided scroll experience. It’s ideal for a health-tech demo, student portfolio, or concept landing page.
+            </p>
+            <div class="hero-actions" style="margin-top:18px">
+              <a class="btn primary" href="#checker">Run check again</a>
+              <a class="btn secondary" href="#care">Review care steps</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-box">
+      <div>CastCheck — screening and tracking only, not a medical diagnosis.</div>
+      <div>Built as a single-file concept website.</div>
+    </div>
+  </footer>
+
+  <script>
+    const pain = document.getElementById('pain');
+    const swelling = document.getElementById('swelling');
+    const color = document.getElementById('color');
+    const movement = document.getElementById('movement');
+    const wet = document.getElementById('wet');
+    const numbness = document.getElementById('numbness');
+    const odor = document.getElementById('odor');
+    const tight = document.getElementById('tight');
+    const lifthelps = document.getElementById('lifthelps');
+    const painVal = document.getElementById('painVal');
+    const status = document.getElementById('status');
+    const summary = document.getElementById('summary');
+    const meterFill = document.getElementById('meterFill');
+
+    function evaluate(){
+      let score = 0;
+      const p = +pain.value;
+      painVal.textContent = p;
+
+      score += p * 5;
+
+      if (swelling.value === 'mild') score += 5;
+      if (swelling.value === 'moderate') score += 18;
+      if (swelling.value === 'severe') score += 30;
+
+      if (color.value === 'pale') score += 22;
+      if (color.value === 'blue') score += 35;
+
+      if (movement.value === 'limited') score += 18;
+      if (movement.value === 'no') score += 35;
+
+      if (wet.value === 'damp') score += 12;
+      if (wet.value === 'wet') score += 26;
+      if (wet.value === 'loose') score += 16;
+
+      if (numbness.checked) score += 28;
+      if (odor.checked) score += 16;
+      if (tight.checked) score += 24;
+      if (!lifthelps.checked && p >= 5) score += 8;
+      if (lifthelps.checked) score -= 10;
+
+      score = Math.max(0, Math.min(100, score));
+      meterFill.style.width = score + '%';
+
+      let cls = 'good';
+      let title = 'On track — keep monitoring.';
+      let text = 'Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.';
+
+      if (score >= 60){
+        cls = 'bad';
+        title = 'Seek medical advice promptly.';
+        text = 'Several answers suggest warning signs such as pressure, circulation changes, or reduced movement. Contact a medical professional soon.';
+      } else if (score >= 25){
+        cls = 'warn';
+        title = 'Monitor closely today.';
+        text = 'Your symptoms deserve a careful recheck. Elevate the limb, rest, and watch for worsening pain, numbness, or colour change.';
+      }
+
+      status.className = 'result ' + cls;
+      status.textContent = title;
+      summary.textContent = text;
+    }
+
+    [pain, swelling, color, movement, wet, numbness, odor, tight, lifthelps].forEach(el => {
+      el.addEventListener('input', evaluate);
+      el.addEventListener('change', evaluate);
+    });
+
+    evaluate();
+  </script>
+</body>
+</html>
