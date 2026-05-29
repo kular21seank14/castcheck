@@ -7,21 +7,19 @@
   <meta name="description" content="An immersive cast recovery checker that helps you track symptoms, monitor progress, and know when to seek medical advice." />
   <style>
     :root{
-      --bg:#06070b;
-      --bg2:#0c1018;
-      --panel:rgba(255,255,255,.07);
-      --panel2:rgba(255,255,255,.1);
+      --bg:#07080c;
+      --bg2:#0d1018;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.09);
       --line:rgba(255,255,255,.12);
-      --line2:rgba(255,255,255,.2);
-      --text:#f6f8ff;
-      --muted:rgba(246,248,255,.72);
-      --soft:rgba(246,248,255,.48);
-      --accent:#86e3ff;
-      --accent2:#c3b2ff;
-      --accent3:#7ef0c1;
-      --warn:#ff996f;
-      --good:#73f0bf;
-      --shadow:0 30px 90px rgba(0,0,0,.48);
+      --text:#f4f6fb;
+      --muted:rgba(244,246,251,.72);
+      --soft:rgba(244,246,251,.48);
+      --accent:#7dd3fc;
+      --accent2:#b7a7ff;
+      --warn:#ff8f6b;
+      --good:#6ee7b7;
+      --shadow:0 30px 80px rgba(0,0,0,.45);
       --radius:28px;
       --radius2:18px;
       --max:1260px;
@@ -33,9 +31,9 @@
       font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color:var(--text);
       background:
-        radial-gradient(1200px 600px at 20% 10%, rgba(134,227,255,.16), transparent 50%),
-        radial-gradient(900px 500px at 80% 15%, rgba(195,178,255,.14), transparent 45%),
-        radial-gradient(900px 700px at 50% 80%, rgba(126,240,193,.08), transparent 50%),
+        radial-gradient(1200px 600px at 20% 10%, rgba(125,211,252,.18), transparent 50%),
+        radial-gradient(900px 500px at 80% 15%, rgba(183,167,255,.14), transparent 45%),
+        radial-gradient(900px 700px at 50% 80%, rgba(110,231,183,.09), transparent 50%),
         linear-gradient(180deg, #05060a 0%, #0a0d14 55%, #05060a 100%);
       overflow-x:hidden;
     }
@@ -46,7 +44,7 @@
       background-image:linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
       background-size:64px 64px;
       mask-image:radial-gradient(circle at center, black 35%, transparent 100%);
-      opacity:.22;
+      opacity:.25;
     }
     .wrap{width:min(var(--max), calc(100% - 40px)); margin:0 auto}
     .topbar{
@@ -58,8 +56,8 @@
       margin:0 auto;
       display:flex; align-items:center; justify-content:space-between;
       gap:16px;
-      background:rgba(8,10,16,.52);
-      backdrop-filter: blur(22px);
+      background:rgba(8,10,16,.5);
+      backdrop-filter: blur(20px);
       border:1px solid var(--line);
       border-radius:999px;
       padding:12px 16px;
@@ -72,7 +70,7 @@
       background:
         radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.15) 18%, transparent 19%),
         linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow:0 0 30px rgba(134,227,255,.35);
+      box-shadow:0 0 30px rgba(125,211,252,.35);
       flex:0 0 auto;
     }
     .brand strong{font-size:14px; letter-spacing:.18em; text-transform:uppercase}
@@ -107,7 +105,7 @@
     }
     .eyebrow i{
       width:8px; height:8px; border-radius:50%;
-      background:var(--good); box-shadow:0 0 18px rgba(115,240,191,.7);
+      background:var(--good); box-shadow:0 0 18px rgba(110,231,183,.7);
       display:inline-block;
     }
     h1{
@@ -136,7 +134,7 @@
     .btn.primary{
       color:#07111c;
       background:linear-gradient(135deg, #9be7ff, #d6c7ff);
-      box-shadow:0 18px 40px rgba(134,227,255,.18);
+      box-shadow:0 18px 40px rgba(125,211,252,.18);
     }
     .btn.secondary{
       color:var(--text);
@@ -167,8 +165,8 @@
       overflow:hidden;
       border:1px solid rgba(255,255,255,.12);
       background:
-        radial-gradient(circle at 20% 20%, rgba(134,227,255,.18), transparent 30%),
-        radial-gradient(circle at 75% 18%, rgba(195,178,255,.18), transparent 35%),
+        radial-gradient(circle at 20% 20%, rgba(125,211,252,.18), transparent 30%),
+        radial-gradient(circle at 75% 18%, rgba(183,167,255,.18), transparent 35%),
         linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
       box-shadow:var(--shadow);
     }
@@ -178,9 +176,9 @@
       filter:blur(2px);
       animation: float 8s ease-in-out infinite;
     }
-    .orb.one{width:220px; height:220px; left:-40px; top:45px; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(134,227,255,.6) 20%, rgba(134,227,255,.08) 58%, transparent 70%)}
-    .orb.two{width:280px; height:280px; right:-70px; top:120px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(195,178,255,.55) 20%, rgba(195,178,255,.08) 58%, transparent 70%); animation-delay:1.2s}
-    .orb.three{width:170px; height:170px; left:22%; bottom:70px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(126,240,193,.45) 18%, rgba(126,240,193,.06) 62%, transparent 72%); animation-delay:2.4s}
+    .orb.one{width:220px; height:220px; left:-40px; top:45px; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(125,211,252,.6) 20%, rgba(125,211,252,.08) 58%, transparent 70%)}
+    .orb.two{width:280px; height:280px; right:-70px; top:120px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(183,167,255,.55) 20%, rgba(183,167,255,.08) 58%, transparent 70%); animation-delay:1.2s}
+    .orb.three{width:170px; height:170px; left:22%; bottom:70px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(110,231,183,.45) 18%, rgba(110,231,183,.06) 62%, transparent 72%); animation-delay:2.4s}
     .cast{
       position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
       width:min(420px, 80%);
@@ -190,7 +188,7 @@
     .cast .ring{
       position:absolute; inset:0;
       border-radius:50%;
-      background:conic-gradient(from 0deg, rgba(134,227,255,.9), rgba(195,178,255,.9), rgba(126,240,193,.9), rgba(134,227,255,.9));
+      background:conic-gradient(from 0deg, rgba(125,211,252,.9), rgba(183,167,255,.9), rgba(110,231,183,.9), rgba(125,211,252,.9));
       mask:radial-gradient(circle, transparent 52%, black 54%);
       opacity:.75;
       animation: spin 18s linear infinite;
@@ -256,181 +254,6 @@
       padding:22px;
       box-shadow:var(--shadow);
     }
-
-    /* upgraded recovery snapshot */
-    .recovery{
-      position:relative;
-      display:grid;
-      gap:16px;
-      overflow:hidden;
-      isolation:isolate;
-    }
-    .recovery::before{
-      content:"";
-      position:absolute; inset:-1px;
-      background:
-        radial-gradient(600px 260px at 20% 15%, rgba(134,227,255,.18), transparent 55%),
-        radial-gradient(500px 240px at 85% 10%, rgba(195,178,255,.16), transparent 45%),
-        radial-gradient(450px 220px at 50% 100%, rgba(126,240,193,.14), transparent 60%);
-      opacity:.9;
-      z-index:-1;
-      pointer-events:none;
-    }
-    .snapshot-grid{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:14px;
-      align-items:stretch;
-    }
-    .snapshot-main, .snapshot-side{
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:24px;
-      backdrop-filter: blur(18px);
-      box-shadow:0 18px 45px rgba(0,0,0,.22);
-    }
-    .snapshot-main{padding:20px}
-    .snapshot-side{padding:18px}
-    .snapshot-top{
-      display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
-      margin-bottom:16px;
-    }
-    .snapshot-label{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.09);
-      color:var(--soft);
-      font-size:12px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-    }
-    .pulse{
-      width:10px; height:10px; border-radius:50%;
-      background:var(--good);
-      box-shadow:0 0 18px rgba(115,240,191,.75);
-    }
-    .snapshot-title{
-      margin:14px 0 8px;
-      font-size:1.65rem;
-      letter-spacing:-.03em;
-      line-height:1.1;
-    }
-    .snapshot-sub{
-      margin:0;
-      color:var(--muted);
-      line-height:1.6;
-      max-width:44ch;
-    }
-    .score-ring{
-      width:118px; height:118px; flex:0 0 auto;
-      position:relative;
-      display:grid; place-items:center;
-    }
-    .score-ring svg{transform:rotate(-90deg)}
-    .score-ring .val{
-      position:absolute;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      line-height:1;
-    }
-    .score-ring .val strong{
-      font-size:1.6rem;
-      letter-spacing:-.04em;
-    }
-    .score-ring .val span{
-      font-size:11px; color:var(--soft); margin-top:4px; letter-spacing:.14em; text-transform:uppercase;
-    }
-    .mini-stats{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-      margin-top:16px;
-    }
-    .mini{
-      padding:14px;
-      border-radius:18px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .mini .k{
-      display:block;
-      font-size:11px;
-      letter-spacing:.16em;
-      text-transform:uppercase;
-      color:var(--soft);
-      margin-bottom:8px;
-    }
-    .mini .v{
-      font-size:1.15rem;
-      font-weight:750;
-      letter-spacing:-.03em;
-    }
-    .trend{
-      margin-top:14px;
-      padding:16px;
-      border-radius:20px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .trend-head{
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      margin-bottom:10px;
-    }
-    .trend-head strong{font-size:13px}
-    .trend-head span{font-size:12px; color:var(--soft)}
-    .bars{
-      display:flex;
-      align-items:flex-end;
-      gap:8px;
-      height:120px;
-    }
-    .bar-wrap{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-    }
-    .bar{
-      width:100%;
-      max-width:54px;
-      border-radius:18px 18px 10px 10px;
-      background:linear-gradient(180deg, rgba(134,227,255,.95), rgba(195,178,255,.9), rgba(115,240,191,.88));
-      box-shadow:0 16px 24px rgba(134,227,255,.18);
-      min-height:12px;
-      transition:height .35s ease;
-    }
-    .bar-wrap label{
-      font-size:11px;
-      color:var(--soft);
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .snapshot-side h4{
-      margin:0 0 12px;
-      font-size:14px;
-      letter-spacing:.15em;
-      text-transform:uppercase;
-      color:var(--soft);
-    }
-    .snapshot-list{
-      display:grid;
-      gap:10px;
-    }
-    .snapshot-chip{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:12px 14px;
-      border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .snapshot-chip span{color:var(--muted); font-size:13px}
-    .snapshot-chip strong{font-size:14px}
     .field{
       display:grid; gap:8px; margin-bottom:14px;
     }
@@ -458,9 +281,20 @@
     }
     .check input{margin-top:4px; transform:scale(1.15)}
     .check span{color:var(--muted); font-size:13px; line-height:1.45}
+    .recovery{
+      display:grid; gap:16px;
+    }
+    .meter{
+      height:16px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden; border:1px solid rgba(255,255,255,.08)
+    }
+    .meter > div{
+      height:100%; width:62%;
+      background:linear-gradient(90deg, var(--warn), #ffd56b, var(--good));
+      border-radius:inherit;
+      box-shadow:0 0 22px rgba(110,231,183,.22);
+    }
     .result{
-      font-size:1.4rem;
-      font-weight:800;
+      font-size:1.4rem; font-weight:750;
       margin:0;
       letter-spacing:-.03em;
     }
@@ -492,7 +326,7 @@
     .dot{
       width:12px; height:12px; border-radius:50%;
       margin-top:6px; background:linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow:0 0 18px rgba(134,227,255,.4);
+      box-shadow:0 0 18px rgba(125,211,252,.4);
       flex:0 0 auto;
     }
     footer{
@@ -511,7 +345,7 @@
     @keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
     @media (max-width: 980px){
-      .hero-grid,.grid-2,.tips,.stat-row,.snapshot-grid{grid-template-columns:1fr}
+      .hero-grid,.grid-2,.tips,.stat-row{grid-template-columns:1fr}
       .scene{min-height:520px}
       .nav{display:none}
       h1{font-size:clamp(2.8rem, 13vw, 5rem)}
@@ -525,8 +359,6 @@
       .section-head{flex-direction:column; align-items:flex-start}
       .btn{width:100%}
       .hero-actions{display:grid; width:100%}
-      .snapshot-top{flex-direction:column; align-items:flex-start}
-      .score-ring{width:102px; height:102px}
     }
   </style>
 </head>
@@ -654,83 +486,11 @@
           </div>
 
           <div class="panel recovery">
-            <div class="snapshot-grid">
-              <div class="snapshot-main">
-                <div class="snapshot-top">
-                  <div>
-                    <div class="snapshot-label"><span class="pulse"></span> Recovery snapshot</div>
-                    <h3 class="snapshot-title" id="status">On track — keep monitoring.</h3>
-                    <p class="snapshot-sub" id="summary">
-                      Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.
-                    </p>
-                  </div>
-                  <div class="score-ring">
-                    <svg width="118" height="118" viewBox="0 0 118 118">
-                      <defs>
-                        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stop-color="#86e3ff"/>
-                          <stop offset="50%" stop-color="#c3b2ff"/>
-                          <stop offset="100%" stop-color="#73f0bf"/>
-                        </linearGradient>
-                      </defs>
-                      <circle cx="59" cy="59" r="49" stroke="rgba(255,255,255,.08)" stroke-width="10" fill="none"></circle>
-                      <circle id="scoreCircle" cx="59" cy="59" r="49" stroke="url(#g)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="307.9" stroke-dashoffset="120"></circle>
-                    </svg>
-                    <div class="val">
-                      <strong id="scoreText">62</strong>
-                      <span>score</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mini-stats">
-                  <div class="mini">
-                    <span class="k">Status</span>
-                    <span class="v" id="statusMini">Monitor</span>
-                  </div>
-                  <div class="mini">
-                    <span class="k">Today</span>
-                    <span class="v" id="todayMini">Stable</span>
-                  </div>
-                  <div class="mini">
-                    <span class="k">Risk flags</span>
-                    <span class="v" id="flagsMini">1</span>
-                  </div>
-                  <div class="mini">
-                    <span class="k">Advice</span>
-                    <span class="v" id="adviceMini">Elevate</span>
-                  </div>
-                </div>
-
-                <div class="trend">
-                  <div class="trend-head">
-                    <strong>7-day recovery trend</strong>
-                    <span id="trendLabel">Improving</span>
-                  </div>
-                  <div class="bars" id="bars">
-                    <div class="bar-wrap"><div class="bar" style="height:40%"></div><label>Mon</label></div>
-                    <div class="bar-wrap"><div class="bar" style="height:48%"></div><label>Tue</label></div>
-                    <div class="bar-wrap"><div class="bar" style="height:52%"></div><label>Wed</label></div>
-                    <div class="bar-wrap"><div class="bar" style="height:60%"></div><label>Thu</label></div>
-                    <div class="bar-wrap"><div class="bar" style="height:67%"></div><label>Fri</label></div>
-                    <div class="bar-wrap"><div class="bar" style="height:75%"></div><label>Sat</label></div>
-                    <div class="bar-wrap"><div class="bar" style="height:82%"></div><label>Sun</label></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="snapshot-side">
-                <h4>Quick signals</h4>
-                <div class="snapshot-list" id="signalList">
-                  <div class="snapshot-chip"><span>Pain trend</span><strong id="painChip">Low</strong></div>
-                  <div class="snapshot-chip"><span>Swelling</span><strong id="swellingChip">Mild</strong></div>
-                  <div class="snapshot-chip"><span>Circulation</span><strong id="colorChip">Normal</strong></div>
-                  <div class="snapshot-chip"><span>Cast condition</span><strong id="castChip">Dry</strong></div>
-                  <div class="snapshot-chip"><span>Movement</span><strong id="moveChip">Good</strong></div>
-                </div>
-              </div>
-            </div>
-
+            <p class="result good" id="status">On track — keep monitoring.</p>
+            <div class="meter"><div id="meterFill"></div></div>
+            <p class="muted" id="summary">
+              Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.
+            </p>
             <div class="tips">
               <div class="tip">
                 <strong>Do this now</strong>
@@ -745,7 +505,6 @@
                 <span>If symptoms worsen or do not improve after elevation, contact a medical professional.</span>
               </div>
             </div>
-
             <div class="panel" style="padding:18px; background:rgba(255,255,255,.03); border-radius:22px;">
               <strong style="display:block; margin-bottom:10px;">What the score means</strong>
               <div class="timeline" id="meaning">
@@ -843,23 +602,12 @@
     const status = document.getElementById('status');
     const summary = document.getElementById('summary');
     const meterFill = document.getElementById('meterFill');
-    const scoreText = document.getElementById('scoreText');
-    const scoreCircle = document.getElementById('scoreCircle');
-    const statusMini = document.getElementById('statusMini');
-    const todayMini = document.getElementById('todayMini');
-    const flagsMini = document.getElementById('flagsMini');
-    const adviceMini = document.getElementById('adviceMini');
-    const trendLabel = document.getElementById('trendLabel');
-    const painChip = document.getElementById('painChip');
-    const swellingChip = document.getElementById('swellingChip');
-    const colorChip = document.getElementById('colorChip');
-    const castChip = document.getElementById('castChip');
-    const moveChip = document.getElementById('moveChip');
 
     function evaluate(){
       let score = 0;
       const p = +pain.value;
       painVal.textContent = p;
+
       score += p * 5;
 
       if (swelling.value === 'mild') score += 5;
@@ -884,49 +632,24 @@
 
       score = Math.max(0, Math.min(100, score));
       meterFill.style.width = score + '%';
-      scoreText.textContent = score;
-
-      const circumference = 307.9;
-      scoreCircle.style.strokeDasharray = circumference;
-      scoreCircle.style.strokeDashoffset = circumference - (circumference * score / 100);
 
       let cls = 'good';
       let title = 'On track — keep monitoring.';
       let text = 'Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.';
-      let mini = 'Stable';
-      let advice = 'Elevate';
-      let trend = 'Improving';
 
       if (score >= 60){
         cls = 'bad';
         title = 'Seek medical advice promptly.';
         text = 'Several answers suggest warning signs such as pressure, circulation changes, or reduced movement. Contact a medical professional soon.';
-        mini = 'Concern';
-        advice = 'Call help';
-        trend = 'Needs review';
       } else if (score >= 25){
         cls = 'warn';
         title = 'Monitor closely today.';
         text = 'Your symptoms deserve a careful recheck. Elevate the limb, rest, and watch for worsening pain, numbness, or colour change.';
-        mini = 'Monitor';
-        advice = 'Recheck';
-        trend = 'Mixed';
       }
 
-      status.className = 'snapshot-title ' + cls;
+      status.className = 'result ' + cls;
       status.textContent = title;
       summary.textContent = text;
-      statusMini.textContent = mini;
-      todayMini.textContent = score < 25 ? 'Stable' : score < 60 ? 'Watchful' : 'Escalated';
-      flagsMini.textContent = [numbness.checked, odor.checked, tight.checked, wet.value !== 'dry', color.value !== 'normal', movement.value !== 'yes'].filter(Boolean).length;
-      adviceMini.textContent = advice;
-      trendLabel.textContent = trend;
-
-      painChip.textContent = p <= 3 ? 'Low' : p <= 6 ? 'Moderate' : 'High';
-      swellingChip.textContent = swelling.value === 'none' ? 'None' : swelling.value === 'mild' ? 'Mild' : swelling.value === 'moderate' ? 'Moderate' : 'Severe';
-      colorChip.textContent = color.value === 'normal' ? 'Normal' : color.value === 'pale' ? 'Pale' : 'Blue';
-      castChip.textContent = wet.value === 'dry' ? 'Dry' : wet.value === 'damp' ? 'Damp' : wet.value === 'wet' ? 'Wet' : 'Loose';
-      moveChip.textContent = movement.value === 'yes' ? 'Good' : movement.value === 'limited' ? 'Limited' : 'None';
     }
 
     [pain, swelling, color, movement, wet, numbness, odor, tight, lifthelps].forEach(el => {
