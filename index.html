@@ -3,1141 +3,938 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CastFlow — Recovery Intelligence</title>
+  <title>CastCheck — Recovery Intelligence</title>
+  <meta name="description" content="An immersive cast recovery checker that helps you track symptoms, monitor progress, and know when to seek medical advice." />
   <style>
     :root{
-      --bg:#070b12;
-      --bg2:#0d1420;
-      --panel:rgba(15,24,38,.72);
-      --panel2:rgba(18,28,44,.9);
-      --stroke:rgba(255,255,255,.08);
-      --stroke2:rgba(124,170,255,.16);
-      --text:#eef4ff;
-      --muted:#9caac2;
-      --muted2:#75839b;
-      --blue:#4b8dff;
-      --blue2:#84b6ff;
-      --cyan:#67e4ff;
-      --green:#31d283;
-      --amber:#ffbf4d;
-      --red:#ff6b6b;
-      --shadow:0 24px 80px rgba(0,0,0,.38);
-      --shadow2:0 14px 30px rgba(0,0,0,.22);
+      --bg:#06070b;
+      --bg2:#0c1018;
+      --panel:rgba(255,255,255,.07);
+      --panel2:rgba(255,255,255,.1);
+      --line:rgba(255,255,255,.12);
+      --line2:rgba(255,255,255,.2);
+      --text:#f6f8ff;
+      --muted:rgba(246,248,255,.72);
+      --soft:rgba(246,248,255,.48);
+      --accent:#86e3ff;
+      --accent2:#c3b2ff;
+      --accent3:#7ef0c1;
+      --warn:#ff996f;
+      --good:#73f0bf;
+      --shadow:0 30px 90px rgba(0,0,0,.48);
       --radius:28px;
       --radius2:18px;
-      --max:1200px;
+      --max:1260px;
     }
-
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at 20% 10%, rgba(75,141,255,.22), transparent 25%),
-        radial-gradient(circle at 80% 0%, rgba(103,228,255,.10), transparent 28%),
-        radial-gradient(circle at 50% 100%, rgba(49,210,131,.08), transparent 22%),
-        linear-gradient(180deg, #05070b 0%, #090d15 45%, #070b12 100%);
+        radial-gradient(1200px 600px at 20% 10%, rgba(134,227,255,.16), transparent 50%),
+        radial-gradient(900px 500px at 80% 15%, rgba(195,178,255,.14), transparent 45%),
+        radial-gradient(900px 700px at 50% 80%, rgba(126,240,193,.08), transparent 50%),
+        linear-gradient(180deg, #05060a 0%, #0a0d14 55%, #05060a 100%);
       overflow-x:hidden;
     }
-
-    .noise:before{
+    body::before{
       content:"";
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       pointer-events:none;
-      opacity:.18;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='%23ffffff' fill-opacity='.04'%3E%3Ccircle cx='18' cy='18' r='1'/%3E%3Ccircle cx='92' cy='40' r='1'/%3E%3Ccircle cx='160' cy='76' r='1'/%3E%3Ccircle cx='52' cy='121' r='1'/%3E%3Ccircle cx='127' cy='148' r='1'/%3E%3C/g%3E%3C/svg%3E");
-      mix-blend-mode:screen;
+      background-image:linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size:64px 64px;
+      mask-image:radial-gradient(circle at center, black 35%, transparent 100%);
+      opacity:.22;
     }
-
     .wrap{width:min(var(--max), calc(100% - 40px)); margin:0 auto}
-    nav{
-      position:sticky; top:0; z-index:60;
-      backdrop-filter: blur(22px);
-      background:rgba(7,11,18,.68);
-      border-bottom:1px solid rgba(255,255,255,.06);
+    .topbar{
+      position:fixed; top:18px; left:0; right:0; z-index:50;
+      pointer-events:none;
     }
-    .navrow{
+    .topbar .inner{
+      width:min(var(--max), calc(100% - 40px));
+      margin:0 auto;
       display:flex; align-items:center; justify-content:space-between;
-      padding:16px 0;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-      text-decoration:none; color:var(--text);
-    }
-    .brandmark{
-      width:40px; height:40px; border-radius:14px;
-      background:linear-gradient(145deg, rgba(75,141,255,1), rgba(103,228,255,.72));
-      box-shadow:0 10px 30px rgba(75,141,255,.28);
-      position:relative;
-      overflow:hidden;
-    }
-    .brandmark:before,.brandmark:after{
-      content:""; position:absolute; inset:auto;
+      gap:16px;
+      background:rgba(8,10,16,.52);
+      backdrop-filter: blur(22px);
+      border:1px solid var(--line);
       border-radius:999px;
-      background:rgba(255,255,255,.9);
+      padding:12px 16px;
+      box-shadow:var(--shadow);
+      pointer-events:auto;
     }
-    .brandmark:before{width:16px;height:16px;left:12px;top:12px;opacity:.95}
-    .brandmark:after{width:10px;height:10px;right:10px;bottom:10px;opacity:.6}
-    .brandtext strong{display:block; font-size:16px; letter-spacing:.2px}
-    .brandtext span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
-
-    .navlinks{display:flex; gap:18px; align-items:center; flex-wrap:wrap}
-    .navlinks a{
-      color:var(--muted); text-decoration:none; font-size:14px; font-weight:600;
-      padding:10px 12px; border-radius:999px; transition:.3s ease;
+    .brand{display:flex; align-items:center; gap:12px; min-width:0}
+    .logo{
+      width:38px; height:38px; border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.15) 18%, transparent 19%),
+        linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 30px rgba(134,227,255,.35);
+      flex:0 0 auto;
     }
-    .navlinks a:hover{color:var(--text); background:rgba(255,255,255,.05)}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      border:none; border-radius:999px; cursor:pointer;
-      font-weight:700; text-decoration:none; transition:.3s cubic-bezier(.2,.9,.2,1);
-      padding:14px 18px; font-size:15px;
+    .brand strong{font-size:14px; letter-spacing:.18em; text-transform:uppercase}
+    .brand span{display:block; font-size:12px; color:var(--muted); margin-top:1px}
+    .nav{display:flex; gap:16px; flex-wrap:wrap; justify-content:flex-end}
+    .nav a{
+      color:var(--muted); text-decoration:none; font-size:13px;
+      padding:8px 10px; border-radius:999px; transition:.25s ease;
     }
-    .btn:hover{transform:translateY(-2px)}
-    .btn-primary{
-      color:white;
-      background:linear-gradient(135deg, var(--blue), #2f5fe8);
-      box-shadow:0 16px 30px rgba(75,141,255,.26);
-    }
-    .btn-secondary{
-      color:var(--text);
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .btn-ghost{
-      color:var(--text);
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(124,170,255,.16);
-    }
-
-    section{padding:34px 0}
+    .nav a:hover{color:var(--text); background:rgba(255,255,255,.06)}
     .hero{
-      min-height:calc(100vh - 76px);
+      min-height:100vh;
       display:grid;
-      grid-template-columns:1.08fr .92fr;
       align-items:center;
-      gap:30px;
-      padding:42px 0 30px;
+      padding:120px 0 54px;
+      position:relative;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:28px;
+      align-items:center;
     }
     .eyebrow{
       display:inline-flex; align-items:center; gap:10px;
-      padding:10px 14px;
+      font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+      color:var(--soft);
+      border:1px solid var(--line);
       border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(124,170,255,.14);
-      color:#d9e7ff;
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:.02em;
-      margin-bottom:18px;
+      padding:10px 14px;
+      background:rgba(255,255,255,.03);
     }
-    .eyebrow:before{
-      content:"";
+    .eyebrow i{
       width:8px; height:8px; border-radius:50%;
-      background:linear-gradient(135deg, var(--cyan), var(--blue));
-      box-shadow:0 0 0 5px rgba(103,228,255,.08);
+      background:var(--good); box-shadow:0 0 18px rgba(115,240,191,.7);
+      display:inline-block;
     }
     h1{
-      font-size:clamp(44px, 6.3vw, 84px);
+      font-size:clamp(3rem, 8vw, 6.8rem);
       line-height:.92;
-      letter-spacing:-.06em;
-      margin:0 0 18px;
-      max-width:10ch;
-    }
-    .lede{
-      font-size:18px;
-      line-height:1.8;
-      color:var(--muted);
-      max-width:640px;
-      margin:0 0 28px;
-    }
-    .actions{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:24px}
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:14px;
-      max-width:760px;
-    }
-    .stat{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;
-      padding:16px;
-      box-shadow:var(--shadow2);
-      backdrop-filter: blur(14px);
-      transition:transform .35s ease, border-color .35s ease, background .35s ease;
-    }
-    .stat:hover{transform:translateY(-4px); border-color:rgba(124,170,255,.22)}
-    .k{font-size:13px; color:var(--muted2); margin-bottom:8px}
-    .v{font-size:24px; font-weight:800; letter-spacing:-.04em}
-    .s{font-size:12px; color:var(--muted); margin-top:6px}
-
-    .device{
-      max-width:420px;
-      margin-left:auto;
-      animation: floaty 8s ease-in-out infinite;
-      filter: drop-shadow(0 30px 60px rgba(0,0,0,.38));
-    }
-    .phone{
-      padding:10px;
-      border-radius:48px;
-      background:linear-gradient(180deg, #101622, #05070b);
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-    }
-    .screen{
-      min-height:760px;
-      border-radius:38px;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(103,228,255,.08), transparent 22%),
-        linear-gradient(180deg, #0d121d 0%, #0b0f17 100%);
-      border:1px solid rgba(255,255,255,.05);
-      position:relative;
-    }
-    .screen:before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(180deg, rgba(255,255,255,.04), transparent 18%, transparent 82%, rgba(255,255,255,.02));
-      pointer-events:none;
-    }
-    .statusbar{
-      height:42px;
-      display:flex;
-      align-items:end;
-      justify-content:space-between;
-      padding:12px 18px 8px;
-      font-size:16px;
-      font-weight:700;
-      color:#f2f6ff;
-    }
-    .appbar{
-      height:72px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:24px;
-      font-weight:800;
-      color:#eff4ff;
-      border-top:1px solid rgba(255,255,255,.05);
-      border-bottom:1px solid rgba(255,255,255,.05);
-      background:rgba(255,255,255,.03);
-      letter-spacing:-.02em;
-    }
-    .screen-content{padding:22px 18px 18px}
-
-    .progress-ring{
-      width:220px;
-      height:220px;
-      margin:0 auto 18px;
-      border-radius:50%;
-      background:conic-gradient(var(--blue) 0 182deg, rgba(255,255,255,.10) 182deg 360deg);
-      position:relative;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-      animation: spinGlow 14s linear infinite;
-    }
-    .progress-ring:before{
-      content:"";
-      position:absolute;
-      inset:16px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 50% 40%, rgba(75,141,255,.08), transparent 55%),
-        linear-gradient(180deg, rgba(15,20,31,.95), rgba(11,15,23,.95));
-      box-shadow:inset 0 2px 20px rgba(0,0,0,.3);
-    }
-    .ring-inner{
-      position:absolute;
-      inset:16px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-    }
-    .pct{font-size:64px; font-weight:900; letter-spacing:-.08em; line-height:.88}
-    .label{font-size:25px; font-weight:800; margin-top:2px}
-    .sub{font-size:16px; color:var(--muted); margin-top:6px}
-    .section-title{
-      text-align:center;
-      font-size:18px;
-      font-weight:800;
-      color:#dfeaff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      margin:18px 0 14px;
-    }
-    .section-title:before,.section-title:after{
-      content:"";
-      height:1px;
-      width:70px;
-      background:linear-gradient(90deg, transparent, rgba(124,170,255,.2), transparent);
-    }
-
-    .cast-illustration{
-      height:220px;
-      border-radius:28px;
-      margin:0 auto 16px;
-      position:relative;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.07);
-      background:
-        radial-gradient(circle at 50% 35%, rgba(103,228,255,.12), transparent 20%),
-        radial-gradient(circle at 50% 50%, rgba(75,141,255,.14), transparent 40%),
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
-    }
-    .cast-illustration:before{
-      content:"";
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-48%);
-      width:120px;
-      height:170px;
-      border-radius:56px;
-      background:
-        linear-gradient(180deg, rgba(243,220,209,.95), rgba(214,183,169,.92));
-      clip-path: polygon(34% 0%, 66% 0%, 74% 9%, 74% 33%, 90% 38%, 90% 62%, 74% 67%, 74% 91%, 66% 100%, 34% 100%, 26% 91%, 26% 67%, 10% 62%, 10% 38%, 26% 33%, 26% 9%);
-      filter:saturate(.96);
-    }
-    .cast-illustration:after{
-      content:"";
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-18%);
-      width:108px;
-      height:110px;
-      border-radius:44px;
-      background:
-        radial-gradient(circle at 50% 40%, rgba(255,77,48,.95), transparent 20%),
-        radial-gradient(circle at 50% 50%, rgba(255,110,90,.74), transparent 42%),
-        linear-gradient(180deg, rgba(255,86,58,.92), rgba(146,25,13,.32));
-      filter:blur(1.5px);
-      opacity:.96;
-      box-shadow:0 0 40px rgba(255,77,48,.25);
-    }
-    .cast-band{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-18%);
-      width:132px;
-      height:38px;
-      border-radius:999px;
-      background:linear-gradient(180deg, rgba(224,234,248,.95), rgba(176,194,214,.85));
-      box-shadow:0 8px 18px rgba(0,0,0,.14);
-      opacity:.92;
-    }
-    .cast-band.left{margin-left:-82px; top:58%}
-    .cast-band.right{margin-left:82px; top:58%}
-    .pulse{
-      position:absolute;
-      inset:auto;
-      width:10px; height:10px;
-      border-radius:50%;
-      background:var(--cyan);
-      box-shadow:0 0 0 0 rgba(103,228,255,.3);
-      animation:pulse 2.4s infinite;
-    }
-    .pulse.one{left:22%; top:30%}
-    .pulse.two{right:22%; top:26%; animation-delay:.8s}
-    .pulse.three{left:18%; bottom:18%; animation-delay:1.5s}
-
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-      margin-top:14px;
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;
-      padding:16px 14px;
-      box-shadow:var(--shadow2);
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-      min-height:98px;
-      transition:transform .35s cubic-bezier(.2,.9,.2,1), border-color .35s ease, background .35s ease;
-      animation: rise .8s ease both;
-    }
-    .card:hover{
-      transform:translateY(-4px);
-      border-color:rgba(124,170,255,.18);
-      background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
-    }
-    .ic{
-      width:40px; height:40px; border-radius:14px;
-      display:grid; place-items:center;
-      flex:0 0 auto;
-      color:white;
-      box-shadow:0 10px 24px rgba(0,0,0,.22);
-    }
-    .ic.blue{background:linear-gradient(135deg, #4a8cf6, #235fdb)}
-    .ic.green{background:linear-gradient(135deg, #37c56e, #18a64d)}
-    .ic.red{background:linear-gradient(135deg, #ff6358, #e53935)}
-    .ic.gray{background:linear-gradient(135deg, #7b8ca6, #516277)}
-    .ic svg{width:20px; height:20px; display:block}
-    .card h4{margin:0 0 4px; font-size:15px; line-height:1.2}
-    .card p{margin:0; font-size:13px; color:var(--muted); line-height:1.5}
-
-    .panel{
-      background:linear-gradient(180deg, rgba(18,28,44,.86), rgba(11,16,26,.76));
-      border:1px solid rgba(255,255,255,.07);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      backdrop-filter:blur(16px);
-    }
-    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:0}
-    .padded{padding:30px}
-    .headline{
-      font-size:34px;
-      line-height:1.05;
+      margin:18px 0 16px;
       letter-spacing:-.05em;
-      margin:0 0 12px;
     }
-    .subcopy{
+    .lead{
+      max-width:62ch;
+      font-size:clamp(1.02rem, 1.8vw, 1.2rem);
       color:var(--muted);
-      font-size:16px;
-      line-height:1.8;
-      margin:0;
+      line-height:1.75;
     }
-
-    .mini{
+    .hero-actions{display:flex; gap:14px; flex-wrap:wrap; margin-top:28px}
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      border-radius:999px;
+      padding:15px 22px;
+      font-weight:650;
+      letter-spacing:.01em;
+      transition:.25s ease;
+      text-decoration:none;
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+    .btn.primary{
+      color:#07111c;
+      background:linear-gradient(135deg, #9be7ff, #d6c7ff);
+      box-shadow:0 18px 40px rgba(134,227,255,.18);
+    }
+    .btn.secondary{
+      color:var(--text);
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .stat-row{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:14px;
-      margin-top:18px;
+      margin-top:30px;
+    }
+    .stat{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      min-height:108px;
+    }
+    .stat strong{display:block; font-size:1.6rem; margin-bottom:8px}
+    .stat span{color:var(--muted); font-size:13px; line-height:1.5}
+    .scene{
+      position:relative;
+      min-height:640px;
+      border-radius:34px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(134,227,255,.18), transparent 30%),
+        radial-gradient(circle at 75% 18%, rgba(195,178,255,.18), transparent 35%),
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+    }
+    .orb{
+      position:absolute; inset:auto;
+      border-radius:50%;
+      filter:blur(2px);
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb.one{width:220px; height:220px; left:-40px; top:45px; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(134,227,255,.6) 20%, rgba(134,227,255,.08) 58%, transparent 70%)}
+    .orb.two{width:280px; height:280px; right:-70px; top:120px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(195,178,255,.55) 20%, rgba(195,178,255,.08) 58%, transparent 70%); animation-delay:1.2s}
+    .orb.three{width:170px; height:170px; left:22%; bottom:70px; background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.85), rgba(126,240,193,.45) 18%, rgba(126,240,193,.06) 62%, transparent 72%); animation-delay:2.4s}
+    .cast{
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      width:min(420px, 80%);
+      aspect-ratio:1/1;
+      display:grid; place-items:center;
+    }
+    .cast .ring{
+      position:absolute; inset:0;
+      border-radius:50%;
+      background:conic-gradient(from 0deg, rgba(134,227,255,.9), rgba(195,178,255,.9), rgba(126,240,193,.9), rgba(134,227,255,.9));
+      mask:radial-gradient(circle, transparent 52%, black 54%);
+      opacity:.75;
+      animation: spin 18s linear infinite;
+    }
+    .cast .core{
+      width:64%;
+      aspect-ratio:1;
+      border-radius:32%;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.38), rgba(255,255,255,.12)),
+        linear-gradient(180deg, rgba(15,18,28,.85), rgba(9,12,18,.95));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.24), 0 30px 80px rgba(0,0,0,.36);
+      position:relative;
+      overflow:hidden;
+    }
+    .cast .core::before, .cast .core::after{
+      content:""; position:absolute; left:50%; transform:translateX(-50%);
+      width:72%; border-radius:999px;
+      background:rgba(255,255,255,.08);
+    }
+    .cast .core::before{height:16px; top:18%}
+    .cast .core::after{height:16px; bottom:18%}
+    .cast .strap{
+      position:absolute; width:22%; height:82%;
+      border-radius:40px;
+      background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05));
+      filter:blur(.2px);
+      top:9%;
+    }
+    .cast .strap.left{left:10%; transform:rotate(-10deg)}
+    .cast .strap.right{right:10%; transform:rotate(10deg)}
+    .float-card{
+      position:absolute;
+      background:rgba(8,10,16,.44);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:0 16px 30px rgba(0,0,0,.22);
+      animation: drift 7s ease-in-out infinite;
+    }
+    .float-card b{display:block; font-size:13px; margin-bottom:4px}
+    .float-card small{color:var(--muted)}
+    .card-a{left:18px; top:18px}
+    .card-b{right:18px; top:26px; animation-delay:1.5s}
+    .card-c{right:36px; bottom:26px; animation-delay:3s}
+    .card-d{left:30px; bottom:40px; animation-delay:4.2s}
+    section{padding:90px 0}
+    .section-head{
+      display:flex; justify-content:space-between; align-items:flex-end; gap:18px;
+      margin-bottom:24px;
+    }
+    .section-head h2{
+      margin:0; font-size:clamp(2rem, 4vw, 3.2rem); letter-spacing:-.04em;
+    }
+    .section-head p{margin:0; max-width:60ch; color:var(--muted); line-height:1.7}
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:var(--shadow);
     }
 
-    .timeline{
+    /* upgraded recovery snapshot */
+    .recovery{
+      position:relative;
       display:grid;
-      gap:12px;
-      margin-top:18px;
-    }
-    .timeitem{
-      display:flex;
-      justify-content:space-between;
       gap:16px;
-      padding:16px 18px;
-      border-radius:18px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.07);
-      transition:transform .3s ease, border-color .3s ease;
+      overflow:hidden;
+      isolation:isolate;
     }
-    .timeitem:hover{transform:translateY(-2px); border-color:rgba(124,170,255,.16)}
-    .timeitem strong{display:block; margin-bottom:4px}
-    .pill{
+    .recovery::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(600px 260px at 20% 15%, rgba(134,227,255,.18), transparent 55%),
+        radial-gradient(500px 240px at 85% 10%, rgba(195,178,255,.16), transparent 45%),
+        radial-gradient(450px 220px at 50% 100%, rgba(126,240,193,.14), transparent 60%);
+      opacity:.9;
+      z-index:-1;
+      pointer-events:none;
+    }
+    .snapshot-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:14px;
+      align-items:stretch;
+    }
+    .snapshot-main, .snapshot-side{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:24px;
+      backdrop-filter: blur(18px);
+      box-shadow:0 18px 45px rgba(0,0,0,.22);
+    }
+    .snapshot-main{padding:20px}
+    .snapshot-side{padding:18px}
+    .snapshot-top{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+      margin-bottom:16px;
+    }
+    .snapshot-label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       padding:8px 12px;
       border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.09);
+      color:var(--soft);
       font-size:12px;
-      font-weight:800;
-      white-space:nowrap;
-      align-self:flex-start;
-      letter-spacing:.02em;
+      letter-spacing:.16em;
+      text-transform:uppercase;
     }
-    .pill.green{background:rgba(49,210,131,.14); color:#5ef0a5}
-    .pill.amber{background:rgba(255,191,77,.14); color:#ffd27c}
-    .pill.red{background:rgba(255,107,107,.14); color:#ff9d9d}
-
-    .checker{
+    .pulse{
+      width:10px; height:10px; border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 18px rgba(115,240,191,.75);
+    }
+    .snapshot-title{
+      margin:14px 0 8px;
+      font-size:1.65rem;
+      letter-spacing:-.03em;
+      line-height:1.1;
+    }
+    .snapshot-sub{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+      max-width:44ch;
+    }
+    .score-ring{
+      width:118px; height:118px; flex:0 0 auto;
+      position:relative;
+      display:grid; place-items:center;
+    }
+    .score-ring svg{transform:rotate(-90deg)}
+    .score-ring .val{
+      position:absolute;
       display:grid;
-      grid-template-columns:1fr 1fr;
+      place-items:center;
+      text-align:center;
+      line-height:1;
     }
-    .checker .left{
-      padding:30px;
-      border-right:1px solid rgba(255,255,255,.06);
+    .score-ring .val strong{
+      font-size:1.6rem;
+      letter-spacing:-.04em;
     }
-    .checker .right{
-      padding:30px;
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+    .score-ring .val span{
+      font-size:11px; color:var(--soft); margin-top:4px; letter-spacing:.14em; text-transform:uppercase;
     }
-
-    .form{
+    .mini-stats{
       display:grid;
-      gap:14px;
-      margin-top:18px;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-top:16px;
     }
-    .field{
-      background:rgba(255,255,255,.035);
-      border:1px solid rgba(255,255,255,.08);
+    .mini{
+      padding:14px;
       border-radius:18px;
-      padding:14px 14px 12px;
-      transition:border-color .3s ease, transform .3s ease, background .3s ease;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
     }
-    .field:hover{
-      border-color:rgba(124,170,255,.2);
-      background:rgba(255,255,255,.05);
-      transform:translateY(-1px);
-    }
-    .field label{
+    .mini .k{
       display:block;
-      font-size:13px;
-      font-weight:700;
-      color:#d6e4ff;
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--soft);
       margin-bottom:8px;
     }
-    .field select,.field input,.field textarea{
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      font:inherit;
-      color:var(--text);
-      resize:vertical;
+    .mini .v{
+      font-size:1.15rem;
+      font-weight:750;
+      letter-spacing:-.03em;
     }
-    select option{background:#0d1420}
-    .range-row{
+    .trend{
+      margin-top:14px;
+      padding:16px;
+      border-radius:20px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .trend-head{
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      margin-bottom:10px;
+    }
+    .trend-head strong{font-size:13px}
+    .trend-head span{font-size:12px; color:var(--soft)}
+    .bars{
       display:flex;
-      justify-content:space-between;
-      color:var(--muted);
-      font-size:13px;
-      margin-top:6px;
+      align-items:flex-end;
+      gap:8px;
+      height:120px;
     }
-    input[type="range"]{width:100%; accent-color:var(--blue)}
-
-    .result{
-      padding:24px;
-      border-radius:24px;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(75,141,255,.14), transparent 30%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
-      border:1px solid rgba(124,170,255,.14);
-      box-shadow:var(--shadow2);
-    }
-    .score{
-      width:154px;
-      height:154px;
-      border-radius:50%;
-      margin:0 auto 14px;
-      background:conic-gradient(var(--green) 0 252deg, rgba(255,255,255,.08) 252deg 360deg);
-      position:relative;
-      animation: spinGlow 16s linear infinite;
-    }
-    .score:before{
-      content:"";
-      position:absolute;
-      inset:14px;
-      border-radius:50%;
-      background:
-        radial-gradient(circle at 50% 40%, rgba(49,210,131,.08), transparent 58%),
-        linear-gradient(180deg, rgba(14,18,28,.98), rgba(10,13,21,.98));
-      box-shadow:inset 0 2px 20px rgba(0,0,0,.35);
-    }
-    .score .inner{
-      position:absolute;
-      inset:14px;
+    .bar-wrap{
+      flex:1;
       display:flex;
       flex-direction:column;
       align-items:center;
-      justify-content:center;
-      text-align:center;
+      gap:8px;
     }
-    .score .inner b{font-size:42px; line-height:1; color:#92ffbf}
-    .score .inner span{font-size:12px; color:var(--muted); margin-top:4px}
-    .footer-note{
-      color:var(--muted2);
-      font-size:13px;
-      line-height:1.75;
+    .bar{
+      width:100%;
+      max-width:54px;
+      border-radius:18px 18px 10px 10px;
+      background:linear-gradient(180deg, rgba(134,227,255,.95), rgba(195,178,255,.9), rgba(115,240,191,.88));
+      box-shadow:0 16px 24px rgba(134,227,255,.18);
+      min-height:12px;
+      transition:height .35s ease;
     }
-
-    .reveal{
-      opacity:0;
-      transform:translateY(24px);
-      transition:opacity .8s cubic-bezier(.2,.9,.2,1), transform .8s cubic-bezier(.2,.9,.2,1);
+    .bar-wrap label{
+      font-size:11px;
+      color:var(--soft);
+      letter-spacing:.08em;
+      text-transform:uppercase;
     }
-    .reveal.show{opacity:1; transform:translateY(0)}
-
-    .modal{
-      position:fixed;
-      inset:0;
+    .snapshot-side h4{
+      margin:0 0 12px;
+      font-size:14px;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      color:var(--soft);
+    }
+    .snapshot-list{
       display:grid;
-      place-items:center;
-      background:rgba(4,7,12,.62);
-      backdrop-filter:blur(12px);
-      opacity:0;
-      pointer-events:none;
-      transition:.35s ease;
-      z-index:100;
-      padding:20px;
-    }
-    .modal.open{opacity:1; pointer-events:auto}
-    .modalbox{
-      width:min(560px, 100%);
-      border-radius:28px;
-      background:linear-gradient(180deg, rgba(18,28,44,.96), rgba(9,13,21,.96));
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:var(--shadow);
-      padding:24px;
-      transform:translateY(16px) scale(.98);
-      transition:.35s cubic-bezier(.2,.9,.2,1);
-    }
-    .modal.open .modalbox{transform:translateY(0) scale(1)}
-    .modalhead{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:14px;
-    }
-    .close{
-      width:38px; height:38px;
-      border-radius:50%;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      cursor:pointer;
-    }
-
-    .statusline{
-      display:flex;
       gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
     }
-    .statuschip{
-      padding:9px 12px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      border:1px solid rgba(255,255,255,.08);
+    .snapshot-chip{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:12px 14px;
+      border-radius:16px;
       background:rgba(255,255,255,.04);
-      color:#dbe7ff;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .snapshot-chip span{color:var(--muted); font-size:13px}
+    .snapshot-chip strong{font-size:14px}
+    .field{
+      display:grid; gap:8px; margin-bottom:14px;
+    }
+    label{font-size:13px; color:var(--muted)}
+    input[type="range"], input[type="number"], select{
+      width:100%;
+      background:rgba(255,255,255,.05);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:14px 14px;
+      outline:none;
+    }
+    input[type="range"]{padding:12px 0}
+    .checks{
+      display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+    }
+    .check{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      min-height:72px;
+    }
+    .check input{margin-top:4px; transform:scale(1.15)}
+    .check span{color:var(--muted); font-size:13px; line-height:1.45}
+    .result{
+      font-size:1.4rem;
+      font-weight:800;
+      margin:0;
+      letter-spacing:-.03em;
+    }
+    .result.good{color:var(--good)}
+    .result.warn{color:#ffd56b}
+    .result.bad{color:var(--warn)}
+    .muted{color:var(--muted); line-height:1.7}
+    .tips{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+      margin-top:16px;
+    }
+    .tip{
+      padding:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+    }
+    .tip strong{display:block; margin-bottom:6px}
+    .timeline{
+      display:grid; gap:12px;
+    }
+    .step{
+      display:flex; gap:14px; align-items:flex-start;
+      padding:16px 18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+    }
+    .dot{
+      width:12px; height:12px; border-radius:50%;
+      margin-top:6px; background:linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow:0 0 18px rgba(134,227,255,.4);
+      flex:0 0 auto;
+    }
+    footer{
+      padding:44px 0 60px;
+      color:var(--soft);
+      font-size:13px;
+    }
+    .footer-box{
+      display:flex; justify-content:space-between; gap:18px; flex-wrap:wrap;
+      border-top:1px solid rgba(255,255,255,.1);
+      padding-top:22px;
     }
 
-    @keyframes floaty{
-      0%,100%{transform:translateY(0px)}
-      50%{transform:translateY(-10px)}
-    }
-    @keyframes spinGlow{
-      from{transform:rotate(0deg)}
-      to{transform:rotate(360deg)}
-    }
-    @keyframes pulse{
-      0%{transform:scale(.7); box-shadow:0 0 0 0 rgba(103,228,255,.4); opacity:1}
-      70%{transform:scale(1); box-shadow:0 0 0 14px rgba(103,228,255,0); opacity:.9}
-      100%{transform:scale(.7); box-shadow:0 0 0 0 rgba(103,228,255,0); opacity:1}
-    }
-    @keyframes rise{
-      from{opacity:0; transform:translateY(14px)}
-      to{opacity:1; transform:translateY(0)}
-    }
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
     @media (max-width: 980px){
-      .hero,.grid2,.checker{grid-template-columns:1fr}
-      .device{margin:0 auto}
-      .checker .left{border-right:none; border-bottom:1px solid rgba(255,255,255,.06)}
-      .stats,.mini,.cards{grid-template-columns:1fr 1fr}
-      h1{max-width:12ch}
+      .hero-grid,.grid-2,.tips,.stat-row,.snapshot-grid{grid-template-columns:1fr}
+      .scene{min-height:520px}
+      .nav{display:none}
+      h1{font-size:clamp(2.8rem, 13vw, 5rem)}
     }
     @media (max-width: 640px){
-      .wrap{width:min(100% - 24px, var(--max))}
-      .navlinks{display:none}
-      .stats,.mini,.cards{grid-template-columns:1fr}
-      .headline{font-size:28px}
-      .screen{min-height:auto}
-      .cast-illustration{height:180px}
+      .wrap{width:min(var(--max), calc(100% - 24px))}
+      .topbar{top:12px}
+      .topbar .inner{padding:10px 12px}
+      .hero{padding-top:110px}
+      .checks{grid-template-columns:1fr}
+      .section-head{flex-direction:column; align-items:flex-start}
+      .btn{width:100%}
+      .hero-actions{display:grid; width:100%}
+      .snapshot-top{flex-direction:column; align-items:flex-start}
+      .score-ring{width:102px; height:102px}
     }
   </style>
 </head>
-<body class="noise">
-  <nav>
-    <div class="wrap navrow">
-      <a class="brand" href="#home">
-        <div class="brandmark"></div>
-        <div class="brandtext">
-          <strong>CastFlow</strong>
-          <span>Recovery Intelligence</span>
+<body>
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <strong>CastCheck</strong>
+          <span>Recovery intelligence for injuries</span>
         </div>
-      </a>
-      <div class="navlinks">
-        <a href="#home">Home</a>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#checker">Checker</a>
       </div>
-      <a class="btn btn-primary" href="#checker">Start Check</a>
+      <nav class="nav">
+        <a href="#checker">Checker</a>
+        <a href="#care">Care guide</a>
+        <a href="#timeline">Timeline</a>
+      </nav>
     </div>
-  </nav>
+  </div>
 
   <main>
-    <section id="home">
-      <div class="wrap hero">
-        <div class="reveal">
-          <div class="eyebrow">Premium cast recovery • dark interface • smooth motion</div>
-          <h1>Track healing with a calmer, more cinematic recovery experience.</h1>
-          <p class="lede">
-            CastFlow blends clinical clarity with an elegant, future-facing layout. The result is a
-            recovery experience that feels more like a luxury product than a form.
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><i></i> Recovery, reimagined</div>
+          <h1>Know whether your cast recovery is on track.</h1>
+          <p class="lead">
+            An immersive cast-check experience that helps you track pain, swelling, numbness, movement, and cast condition — then suggests whether you should monitor at home or seek medical advice.
           </p>
-          <div class="actions">
-            <a class="btn btn-primary" href="#dashboard">View Dashboard</a>
-            <a class="btn btn-secondary" href="#checker">Open Recovery Check</a>
+          <div class="hero-actions">
+            <a class="btn primary" href="#checker">Start recovery check</a>
+            <a class="btn secondary" href="#care">See cast care tips</a>
           </div>
-          <div class="stats">
+          <div class="stat-row">
             <div class="stat">
-              <div class="k">Current status</div>
-              <div class="v">On track</div>
-              <div class="s">Mock data preview</div>
+              <strong>60 sec</strong>
+              <span>Fast symptom check with a luxury-style guided flow.</span>
             </div>
             <div class="stat">
-              <div class="k">Healing progress</div>
-              <div class="v">50%</div>
-              <div class="s">Estimated stage</div>
+              <strong>Daily</strong>
+              <span>Track your healing with check-ins and a recovery timeline.</span>
             </div>
             <div class="stat">
-              <div class="k">Next review</div>
-              <div class="v">4 days</div>
-              <div class="s">Until the next check-in</div>
+              <strong>Clear</strong>
+              <span>Simple next-step guidance when warning signs appear.</span>
             </div>
           </div>
         </div>
 
-        <div class="device reveal">
-          <div class="phone">
-            <div class="screen">
-              <div class="statusbar">
-                <div>9:41</div>
-                <div style="font-size:13px; opacity:.9">▮▮▮  ⌁  ▭</div>
-              </div>
-              <div class="appbar">ACL Recovery</div>
-              <div class="screen-content">
-                <div class="progress-ring">
-                  <div class="ring-inner">
-                    <div class="pct">50%</div>
-                    <div class="label">Healed</div>
-                    <div class="sub">Progress Tracking</div>
-                  </div>
-                </div>
-
-                <div class="section-title">Recovery Snapshot</div>
-
-                <div class="cast-illustration">
-                  <div class="cast-band left"></div>
-                  <div class="cast-band right"></div>
-                  <span class="pulse one"></span>
-                  <span class="pulse two"></span>
-                  <span class="pulse three"></span>
-                </div>
-
-                <div class="cards">
-                  <div class="card">
-                    <div class="ic blue">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="4" y="5" width="16" height="15" rx="3"></rect>
-                        <path d="M8 3v4M16 3v4M4 10h16"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h4>Time Until Fully Healed</h4>
-                      <p>4–6 weeks left</p>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="ic green">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 3v18"></path>
-                        <path d="M6 12h12"></path>
-                        <path d="M6 12a3 3 0 0 1 3-3h3v3H9"></path>
-                        <path d="M18 12a3 3 0 0 0-3-3h-3v3h3"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h4>Rehab Exercises</h4>
-                      <p>View workouts</p>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="ic red">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 3v18"></path>
-                        <path d="M12 3C8 7 6 9.5 6 13a6 6 0 0 0 12 0c0-3.5-2-6-6-10z"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h4>Pain Tracking</h4>
-                      <p>Log symptoms</p>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="ic gray">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="5" y="3" width="14" height="18" rx="2"></rect>
-                        <path d="M8 7h8M8 11h8M8 15h5"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <h4>Doctor Notes</h4>
-                      <p>Medical updates</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div class="scene" aria-hidden="true">
+          <div class="orb one"></div>
+          <div class="orb two"></div>
+          <div class="orb three"></div>
+          <div class="cast">
+            <div class="ring"></div>
+            <div class="strap left"></div>
+            <div class="strap right"></div>
+            <div class="core"></div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="dashboard">
-      <div class="wrap panel reveal">
-        <div class="grid2">
-          <div class="padded">
-            <div class="eyebrow">Recovery dashboard</div>
-            <h2 class="headline">A more polished middle step before the checker.</h2>
-            <p class="subcopy">
-              This section gives the product a more premium flow. Users first see recovery progress,
-              subtle motion, and a cleaner cast visual before moving into the question-based checker.
-            </p>
-
-            <div class="mini">
-              <div class="stat">
-                <div class="k">Pain level</div>
-                <div class="v">3 / 10</div>
-                <div class="s">Improving slowly</div>
-              </div>
-              <div class="stat">
-                <div class="k">Swelling</div>
-                <div class="v">Low</div>
-                <div class="s">Stable for 3 days</div>
-              </div>
-              <div class="stat">
-                <div class="k">Mobility</div>
-                <div class="v">68%</div>
-                <div class="s">Better than last week</div>
-              </div>
-            </div>
-
-            <div class="timeline">
-              <div class="timeitem">
-                <div>
-                  <strong>Today</strong>
-                  Mild discomfort after movement, no urgent warning signs.
-                </div>
-                <div class="pill green">Good</div>
-              </div>
-              <div class="timeitem">
-                <div>
-                  <strong>Yesterday</strong>
-                  Slight swelling in the evening, improved with elevation.
-                </div>
-                <div class="pill amber">Monitor</div>
-              </div>
-              <div class="timeitem">
-                <div>
-                  <strong>Last 7 days</strong>
-                  Pain has trended down with consistent rest and care.
-                </div>
-                <div class="pill green">Trending up</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="padded" style="border-left:1px solid rgba(255,255,255,.06); background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));">
-            <div class="result">
-              <div class="eyebrow" style="margin-bottom:14px;">Mock status</div>
-              <div class="score">
-                <div class="inner">
-                  <b>50%</b>
-                  <span>Healed</span>
-                </div>
-              </div>
-              <h3 style="margin:0 0 8px; font-size:22px; text-align:center;">Recovery is progressing normally</h3>
-              <p style="margin:0 0 18px; text-align:center; color:var(--muted); line-height:1.75;">
-                Keep monitoring pain, cast comfort, swelling, and circulation. This preview is intentionally
-                calm and premium, with subtle motion instead of loud UI.
-              </p>
-              <div class="cards" style="grid-template-columns:1fr; gap:12px;">
-                <div class="card">
-                  <div class="ic blue">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20 6 9 17l-5-5"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h4>Suggested action</h4>
-                    <p>Continue rest, elevation, and light movement as advised.</p>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="ic amber" style="background:linear-gradient(135deg, #ffbf4d, #d68c11)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-                      <path d="M12 5v9"></path><path d="M12 18h.01"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h4>Watch for changes</h4>
-                    <p>Increase in pain, numbness, cold toes/fingers, or tightness.</p>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="ic red">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M12 2l2.9 5.9L21 9l-4.5 4.4 1.1 6.4L12 17.9 6.4 19.8l1.1-6.4L3 9l6.1-1.1L12 2z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h4>Next review</h4>
-                    <p>Run the checker after the next symptom update.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="float-card card-a"><b>Pain trend</b><small>down 18% this week</small></div>
+          <div class="float-card card-b"><b>Swelling</b><small>improving after elevation</small></div>
+          <div class="float-card card-c"><b>Cast status</b><small>dry, intact, secure</small></div>
+          <div class="float-card card-d"><b>Confidence</b><small>based on today’s answers</small></div>
         </div>
       </div>
     </section>
 
     <section id="checker">
-      <div class="wrap panel checker reveal">
-        <div class="left">
-          <div class="eyebrow">Recovery checker</div>
-          <h2 class="headline">Answer a few questions and get a live result.</h2>
-          <p class="subcopy">
-            The button now works. It reads the selected answers, applies a simple score, and returns a
-            recovery status with guidance.
-          </p>
-
-          <div class="form" id="checkForm">
-            <div class="field">
-              <label for="pain">How much pain are you feeling?</label>
-              <input id="pain" type="range" min="0" max="10" value="3" />
-              <div class="range-row"><span>0</span><span id="painLabel">3 / 10</span><span>10</span></div>
-            </div>
-
-            <div class="field">
-              <label for="swelling">Swelling</label>
-              <select id="swelling">
-                <option>Low</option>
-                <option>Moderate</option>
-                <option>High</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="tightness">Does the cast feel too tight?</label>
-              <select id="tightness">
-                <option>No</option>
-                <option>Sometimes</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="circulation">Any numbness, coldness, or color change?</label>
-              <select id="circulation">
-                <option>No</option>
-                <option>Maybe</option>
-                <option>Yes</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="mobility">Movement ability</label>
-              <select id="mobility">
-                <option>Improving</option>
-                <option>Stable</option>
-                <option>Worse</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="notes">Notes</label>
-              <textarea id="notes" rows="4" placeholder="Add symptoms, date of injury, or doctor advice..."></textarea>
-            </div>
-
-            <button class="btn btn-primary" id="runCheck" type="button">Run Recovery Check</button>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Recovery checker</h2>
+            <p>Answer a few quick questions. The result is a screening recommendation, not a diagnosis, so you always get a safer next step.</p>
           </div>
         </div>
 
-        <div class="right">
-          <div class="result" id="resultBox">
-            <div class="eyebrow">Output preview</div>
-            <h3 id="statusTitle" style="margin:0 0 10px; font-size:26px;">Status: On track</h3>
-            <p id="statusText" class="footer-note" style="margin:0 0 16px;">
-              Based on the current mock inputs, recovery looks stable. Symptoms do not suggest urgent concern,
-              but the cast should still be monitored daily.
-            </p>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="field">
+              <label for="pain">Pain level today: <span id="painVal">3</span>/10</label>
+              <input id="pain" type="range" min="0" max="10" value="3" />
+            </div>
+            <div class="field">
+              <label for="swelling">Swelling</label>
+              <select id="swelling">
+                <option value="none">None</option>
+                <option value="mild" selected>Mild and improving</option>
+                <option value="moderate">Moderate</option>
+                <option value="severe">Severe or worsening</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="color">Fingers / toes colour</label>
+              <select id="color">
+                <option value="normal" selected>Normal / warm</option>
+                <option value="pale">Pale / cold</option>
+                <option value="blue">Blue / purple</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="movement">Can you wiggle fingers / toes?</label>
+              <select id="movement">
+                <option value="yes" selected>Yes</option>
+                <option value="limited">Somewhat limited</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wet">Cast condition</label>
+              <select id="wet">
+                <option value="dry" selected>Dry and intact</option>
+                <option value="damp">Damp</option>
+                <option value="wet">Wet / soft / cracked</option>
+                <option value="loose">Loose or slipping</option>
+              </select>
+            </div>
 
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="numbness"><span>Numbness or tingling in fingers / toes</span></label>
+              <label class="check"><input type="checkbox" id="odor"><span>Bad smell, drainage, or fever</span></label>
+              <label class="check"><input type="checkbox" id="tight"><span>Cast feels too tight or pressure is rising</span></label>
+              <label class="check"><input type="checkbox" id="lifthelps"><span>Elevation helps symptoms improve</span></label>
+            </div>
+          </div>
+
+          <div class="panel recovery">
+            <div class="snapshot-grid">
+              <div class="snapshot-main">
+                <div class="snapshot-top">
+                  <div>
+                    <div class="snapshot-label"><span class="pulse"></span> Recovery snapshot</div>
+                    <h3 class="snapshot-title" id="status">On track — keep monitoring.</h3>
+                    <p class="snapshot-sub" id="summary">
+                      Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.
+                    </p>
+                  </div>
+                  <div class="score-ring">
+                    <svg width="118" height="118" viewBox="0 0 118 118">
+                      <defs>
+                        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stop-color="#86e3ff"/>
+                          <stop offset="50%" stop-color="#c3b2ff"/>
+                          <stop offset="100%" stop-color="#73f0bf"/>
+                        </linearGradient>
+                      </defs>
+                      <circle cx="59" cy="59" r="49" stroke="rgba(255,255,255,.08)" stroke-width="10" fill="none"></circle>
+                      <circle id="scoreCircle" cx="59" cy="59" r="49" stroke="url(#g)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="307.9" stroke-dashoffset="120"></circle>
+                    </svg>
+                    <div class="val">
+                      <strong id="scoreText">62</strong>
+                      <span>score</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mini-stats">
+                  <div class="mini">
+                    <span class="k">Status</span>
+                    <span class="v" id="statusMini">Monitor</span>
+                  </div>
+                  <div class="mini">
+                    <span class="k">Today</span>
+                    <span class="v" id="todayMini">Stable</span>
+                  </div>
+                  <div class="mini">
+                    <span class="k">Risk flags</span>
+                    <span class="v" id="flagsMini">1</span>
+                  </div>
+                  <div class="mini">
+                    <span class="k">Advice</span>
+                    <span class="v" id="adviceMini">Elevate</span>
+                  </div>
+                </div>
+
+                <div class="trend">
+                  <div class="trend-head">
+                    <strong>7-day recovery trend</strong>
+                    <span id="trendLabel">Improving</span>
+                  </div>
+                  <div class="bars" id="bars">
+                    <div class="bar-wrap"><div class="bar" style="height:40%"></div><label>Mon</label></div>
+                    <div class="bar-wrap"><div class="bar" style="height:48%"></div><label>Tue</label></div>
+                    <div class="bar-wrap"><div class="bar" style="height:52%"></div><label>Wed</label></div>
+                    <div class="bar-wrap"><div class="bar" style="height:60%"></div><label>Thu</label></div>
+                    <div class="bar-wrap"><div class="bar" style="height:67%"></div><label>Fri</label></div>
+                    <div class="bar-wrap"><div class="bar" style="height:75%"></div><label>Sat</label></div>
+                    <div class="bar-wrap"><div class="bar" style="height:82%"></div><label>Sun</label></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="snapshot-side">
+                <h4>Quick signals</h4>
+                <div class="snapshot-list" id="signalList">
+                  <div class="snapshot-chip"><span>Pain trend</span><strong id="painChip">Low</strong></div>
+                  <div class="snapshot-chip"><span>Swelling</span><strong id="swellingChip">Mild</strong></div>
+                  <div class="snapshot-chip"><span>Circulation</span><strong id="colorChip">Normal</strong></div>
+                  <div class="snapshot-chip"><span>Cast condition</span><strong id="castChip">Dry</strong></div>
+                  <div class="snapshot-chip"><span>Movement</span><strong id="moveChip">Good</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tips">
+              <div class="tip">
+                <strong>Do this now</strong>
+                <span>Keep the cast dry, rest the limb, and elevate it above heart level when possible.</span>
+              </div>
+              <div class="tip">
+                <strong>Watch for</strong>
+                <span>Worsening pain, numbness, cold or blue digits, swelling, or trouble moving fingers / toes.</span>
+              </div>
+              <div class="tip">
+                <strong>Next step</strong>
+                <span>If symptoms worsen or do not improve after elevation, contact a medical professional.</span>
+              </div>
+            </div>
+
+            <div class="panel" style="padding:18px; background:rgba(255,255,255,.03); border-radius:22px;">
+              <strong style="display:block; margin-bottom:10px;">What the score means</strong>
+              <div class="timeline" id="meaning">
+                <div class="step"><div class="dot"></div><div><strong style="display:block;">0–24</strong><span class="muted">Likely on track. Keep following cast care instructions.</span></div></div>
+                <div class="step"><div class="dot"></div><div><strong style="display:block;">25–59</strong><span class="muted">Monitor closely. Recheck symptoms and elevate the limb.</span></div></div>
+                <div class="step"><div class="dot"></div><div><strong style="display:block;">60+</strong><span class="muted">Seek medical advice promptly, especially for tightness, numbness, or color change.</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="care">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Cast care guide</h2>
+            <p>The experience should educate as it reassures. These are the practical reminders most users need every day.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3 style="margin-top:0;">Daily habits</h3>
+            <p class="muted">Keep the cast dry, avoid putting objects inside it, and raise the injured limb to reduce swelling. Moving fingers or toes gently can also help circulation when it’s safe to do so.</p>
             <div class="timeline">
-              <div class="timeitem">
-                <div>
-                  <strong>Healing estimate</strong>
-                  <span id="estimateText">About 4–6 weeks remaining</span>
-                </div>
-                <div class="pill green" id="estimatePill">Stable</div>
-              </div>
-              <div class="timeitem">
-                <div>
-                  <strong>Advice</strong>
-                  <span id="adviceText">Rest, elevate, and keep the cast dry</span>
-                </div>
-                <div class="pill green" id="advicePill">OK</div>
-              </div>
-              <div class="timeitem">
-                <div>
-                  <strong>Urgent check</strong>
-                  <span id="urgentText">Seek help if pain rises sharply or circulation changes</span>
-                </div>
-                <div class="pill amber" id="urgentPill">Monitor</div>
-              </div>
+              <div class="step"><div class="dot"></div><div><strong>Keep it dry</strong><span class="muted">Use protection in the shower and avoid soaking the cast.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Elevate often</strong><span class="muted">Swelling usually feels better when the limb is raised above the heart.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Don’t insert objects</strong><span class="muted">Scratchers, pencils, and powders can irritate skin and damage the cast.</span></div></div>
             </div>
-
-            <div class="statusline" id="chips">
-              <span class="statuschip">Daily check-in</span>
-              <span class="statuschip">Progress tracking</span>
-              <span class="statuschip">Cast monitoring</span>
+          </div>
+          <div class="panel">
+            <h3 style="margin-top:0;">Get help sooner if</h3>
+            <p class="muted">A cast should not cause escalating pain, numbness, blue or pale digits, or reduced movement. Wet, cracked, loose, or foul-smelling casts also need attention.</p>
+            <div class="timeline">
+              <div class="step"><div class="dot"></div><div><strong>Severe pain or tightness</strong><span class="muted">Especially if elevation doesn’t help.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Numbness or tingling</strong><span class="muted">This can signal too much pressure or circulation issues.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Color change</strong><span class="muted">Cold, pale, blue, or purple fingers and toes are not normal.</span></div></div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <p class="footer-note" style="margin-top:18px;">
-              This tool screens for patterns only. It does not diagnose. Severe pain, numbness, coldness,
-              blue/white color changes, or sudden tightness should be treated as higher concern.
+    <section id="timeline">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Recovery timeline</h2>
+            <p>Make the site feel premium by showing progress over time, not just a static answer.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3 style="margin-top:0;">Suggested journey</h3>
+            <div class="timeline">
+              <div class="step"><div class="dot"></div><div><strong>Day 1–3</strong><span class="muted">Expect swelling, use elevation, and track pain every few hours.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Day 4–10</strong><span class="muted">Symptoms should begin settling. Tightness or worsening discomfort deserves attention.</span></div></div>
+              <div class="step"><div class="dot"></div><div><strong>Week 2+</strong><span class="muted">Track function, comfort, and whether the cast still feels secure and dry.</span></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3 style="margin-top:0;">Product notes</h3>
+            <p class="muted">
+              This layout is designed to feel like a luxury digital launch: strong typography, cinematic depth, smooth motion, and a guided scroll experience. It’s ideal for a health-tech demo, student portfolio, or concept landing page.
             </p>
+            <div class="hero-actions" style="margin-top:18px">
+              <a class="btn primary" href="#checker">Run check again</a>
+              <a class="btn secondary" href="#care">Review care steps</a>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <div class="modal" id="modal">
-    <div class="modalbox">
-      <div class="modalhead">
-        <div>
-          <div class="eyebrow" style="margin-bottom:12px;">Recovery result</div>
-          <h3 id="modalTitle" style="margin:0; font-size:28px;">Status: On track</h3>
-        </div>
-        <button class="close" id="closeModal" aria-label="Close">✕</button>
-      </div>
-      <p id="modalText" class="subcopy" style="margin-top:0"></p>
-      <div class="statusline">
-        <span class="statuschip" id="modalChip1">Stable</span>
-        <span class="statuschip" id="modalChip2">Daily monitoring</span>
-        <span class="statuschip" id="modalChip3">No urgent signs</span>
-      </div>
+  <footer>
+    <div class="wrap footer-box">
+      <div>CastCheck — screening and tracking only, not a medical diagnosis.</div>
+      <div>Built as a single-file concept website.</div>
     </div>
-  </div>
+  </footer>
 
   <script>
     const pain = document.getElementById('pain');
-    const painLabel = document.getElementById('painLabel');
-    const runCheck = document.getElementById('runCheck');
-    const modal = document.getElementById('modal');
-    const closeModal = document.getElementById('closeModal');
+    const swelling = document.getElementById('swelling');
+    const color = document.getElementById('color');
+    const movement = document.getElementById('movement');
+    const wet = document.getElementById('wet');
+    const numbness = document.getElementById('numbness');
+    const odor = document.getElementById('odor');
+    const tight = document.getElementById('tight');
+    const lifthelps = document.getElementById('lifthelps');
+    const painVal = document.getElementById('painVal');
+    const status = document.getElementById('status');
+    const summary = document.getElementById('summary');
+    const meterFill = document.getElementById('meterFill');
+    const scoreText = document.getElementById('scoreText');
+    const scoreCircle = document.getElementById('scoreCircle');
+    const statusMini = document.getElementById('statusMini');
+    const todayMini = document.getElementById('todayMini');
+    const flagsMini = document.getElementById('flagsMini');
+    const adviceMini = document.getElementById('adviceMini');
+    const trendLabel = document.getElementById('trendLabel');
+    const painChip = document.getElementById('painChip');
+    const swellingChip = document.getElementById('swellingChip');
+    const colorChip = document.getElementById('colorChip');
+    const castChip = document.getElementById('castChip');
+    const moveChip = document.getElementById('moveChip');
 
-    const ids = {
-      swelling: document.getElementById('swelling'),
-      tightness: document.getElementById('tightness'),
-      circulation: document.getElementById('circulation'),
-      mobility: document.getElementById('mobility'),
-      statusTitle: document.getElementById('statusTitle'),
-      statusText: document.getElementById('statusText'),
-      estimateText: document.getElementById('estimateText'),
-      adviceText: document.getElementById('adviceText'),
-      urgentText: document.getElementById('urgentText'),
-      estimatePill: document.getElementById('estimatePill'),
-      advicePill: document.getElementById('advicePill'),
-      urgentPill: document.getElementById('urgentPill'),
-      modalTitle: document.getElementById('modalTitle'),
-      modalText: document.getElementById('modalText'),
-      modalChip1: document.getElementById('modalChip1'),
-      modalChip2: document.getElementById('modalChip2'),
-      modalChip3: document.getElementById('modalChip3')
-    };
-
-    pain.addEventListener('input', () => painLabel.textContent = `${pain.value} / 10`);
-
-    function setPill(el, type, text){
-      el.className = 'pill ' + type;
-      el.textContent = text;
-    }
-
-    function runRecoveryCheck(){
+    function evaluate(){
       let score = 0;
-      const p = Number(pain.value);
-      score += Math.max(0, 10 - p);
+      const p = +pain.value;
+      painVal.textContent = p;
+      score += p * 5;
 
-      const swelling = ids.swelling.value;
-      const tightness = ids.tightness.value;
-      const circulation = ids.circulation.value;
-      const mobility = ids.mobility.value;
+      if (swelling.value === 'mild') score += 5;
+      if (swelling.value === 'moderate') score += 18;
+      if (swelling.value === 'severe') score += 30;
 
-      if(swelling === 'Low') score += 2;
-      if(swelling === 'Moderate') score += 1;
+      if (color.value === 'pale') score += 22;
+      if (color.value === 'blue') score += 35;
 
-      if(tightness === 'No') score += 2;
-      if(tightness === 'Sometimes') score += 0;
+      if (movement.value === 'limited') score += 18;
+      if (movement.value === 'no') score += 35;
 
-      if(circulation === 'No') score += 3;
-      if(circulation === 'Maybe') score += 0;
+      if (wet.value === 'damp') score += 12;
+      if (wet.value === 'wet') score += 26;
+      if (wet.value === 'loose') score += 16;
 
-      if(mobility === 'Improving') score += 2;
-      if(mobility === 'Stable') score += 1;
+      if (numbness.checked) score += 28;
+      if (odor.checked) score += 16;
+      if (tight.checked) score += 24;
+      if (!lifthelps.checked && p >= 5) score += 8;
+      if (lifthelps.checked) score -= 10;
 
-      let title, text, est, advice, urgent, p1, p2, p3, c1, c2, c3;
+      score = Math.max(0, Math.min(100, score));
+      meterFill.style.width = score + '%';
+      scoreText.textContent = score;
 
-      if(circulation === 'Yes' || tightness === 'Yes' || p >= 8 || swelling === 'High' || mobility === 'Worse'){
-        title = 'Status: Needs medical review';
-        text = 'The current answers suggest higher concern. Worsening pain, circulation changes, or a tight cast should be checked by a clinician.';
-        est = 'Recovery may need reassessment';
-        advice = 'Contact a medical professional promptly';
-        urgent = 'Higher priority: seek care soon';
-        p1 = 'red'; p2 = 'red'; p3 = 'amber';
-        c1 = 'Needs review'; c2 = 'Monitor closely'; c3 = 'Urgent signs present';
-      } else if(score >= 11){
-        title = 'Status: On track';
-        text = 'The recovery pattern looks stable and aligned with normal healing. Keep tracking symptoms and follow your care plan.';
-        est = 'About 4–6 weeks remaining';
-        advice = 'Rest, elevate, and keep the cast dry';
-        urgent = 'Seek help if pain rises sharply';
-        p1 = 'green'; p2 = 'green'; p3 = 'amber';
-        c1 = 'Stable'; c2 = 'Daily tracking'; c3 = 'No urgent signs';
-      } else {
-        title = 'Status: Monitor closely';
-        text = 'The recovery looks mostly fine, but a few answers suggest you should keep a closer eye on swelling, pain, and tightness.';
-        est = 'Estimate unchanged for now';
-        advice = 'Continue daily checks and symptom logging';
-        urgent = 'Escalate if symptoms worsen';
-        p1 = 'amber'; p2 = 'amber'; p3 = 'amber';
-        c1 = 'Watch closely'; c2 = 'Symptom review'; c3 = 'No immediate red flags';
+      const circumference = 307.9;
+      scoreCircle.style.strokeDasharray = circumference;
+      scoreCircle.style.strokeDashoffset = circumference - (circumference * score / 100);
+
+      let cls = 'good';
+      let title = 'On track — keep monitoring.';
+      let text = 'Your answers suggest the cast is likely doing its job and symptoms are staying within a safer range.';
+      let mini = 'Stable';
+      let advice = 'Elevate';
+      let trend = 'Improving';
+
+      if (score >= 60){
+        cls = 'bad';
+        title = 'Seek medical advice promptly.';
+        text = 'Several answers suggest warning signs such as pressure, circulation changes, or reduced movement. Contact a medical professional soon.';
+        mini = 'Concern';
+        advice = 'Call help';
+        trend = 'Needs review';
+      } else if (score >= 25){
+        cls = 'warn';
+        title = 'Monitor closely today.';
+        text = 'Your symptoms deserve a careful recheck. Elevate the limb, rest, and watch for worsening pain, numbness, or colour change.';
+        mini = 'Monitor';
+        advice = 'Recheck';
+        trend = 'Mixed';
       }
 
-      ids.statusTitle.textContent = title;
-      ids.statusText.textContent = text;
-      ids.estimateText.textContent = est;
-      ids.adviceText.textContent = advice;
-      ids.urgentText.textContent = urgent;
+      status.className = 'snapshot-title ' + cls;
+      status.textContent = title;
+      summary.textContent = text;
+      statusMini.textContent = mini;
+      todayMini.textContent = score < 25 ? 'Stable' : score < 60 ? 'Watchful' : 'Escalated';
+      flagsMini.textContent = [numbness.checked, odor.checked, tight.checked, wet.value !== 'dry', color.value !== 'normal', movement.value !== 'yes'].filter(Boolean).length;
+      adviceMini.textContent = advice;
+      trendLabel.textContent = trend;
 
-      setPill(ids.estimatePill, p1, c1);
-      setPill(ids.advicePill, p2, c2);
-      setPill(ids.urgentPill, p3, c3);
-
-      ids.modalTitle.textContent = title;
-      ids.modalText.textContent = text + ' ' + advice + '.';
-      ids.modalChip1.textContent = c1;
-      ids.modalChip2.textContent = c2;
-      ids.modalChip3.textContent = c3;
-
-      modal.classList.add('open');
+      painChip.textContent = p <= 3 ? 'Low' : p <= 6 ? 'Moderate' : 'High';
+      swellingChip.textContent = swelling.value === 'none' ? 'None' : swelling.value === 'mild' ? 'Mild' : swelling.value === 'moderate' ? 'Moderate' : 'Severe';
+      colorChip.textContent = color.value === 'normal' ? 'Normal' : color.value === 'pale' ? 'Pale' : 'Blue';
+      castChip.textContent = wet.value === 'dry' ? 'Dry' : wet.value === 'damp' ? 'Damp' : wet.value === 'wet' ? 'Wet' : 'Loose';
+      moveChip.textContent = movement.value === 'yes' ? 'Good' : movement.value === 'limited' ? 'Limited' : 'None';
     }
 
-    runCheck.addEventListener('click', runRecoveryCheck);
-    closeModal.addEventListener('click', () => modal.classList.remove('open'));
-    modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('open'); });
+    [pain, swelling, color, movement, wet, numbness, odor, tight, lifthelps].forEach(el => {
+      el.addEventListener('input', evaluate);
+      el.addEventListener('change', evaluate);
+    });
 
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting) entry.target.classList.add('show');
-      });
-    }, {threshold: 0.12});
-
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    evaluate();
   </script>
 </body>
 </html>
